@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,10 @@ using static Define;
 
 public class PlayerMove : MonoBehaviour, IMoveAble
 {
+    [SerializeField]
+    private Transform target;
+
+
     [SerializeField]
     private float _speed = 5f; // 캐릭터의 이동속도
     [SerializeField]
@@ -26,6 +31,7 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
     public UnityEvent OnBattle = null; // Battle 상태일 때 실행될 이벤트
     public UnityEvent OnIdle = null; // Battle 상태가 아닐 때 실행될 이벤트
+    public UnityEvent OnZoom = null; // 우클릭을 눌렀을 때 실행될 이벤트
 
     private bool _isStop = false; // true면 안움직임
     public bool IsStop { get => _isStop; set => _isStop = value; } // 인터페이스 구현
@@ -33,11 +39,20 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     public bool IsBattle { get => _isBattle; set => _isBattle = value; } // _isBattle에 대한 get set 프로퍼티
 
     private CharacterController _characterController = null; // 캐릭터 컨트롤러 캐싱 준비
+    private CinemachineFreeLook cinemacine = null; // 점호
     private CollisionFlags _collisionFlags = CollisionFlags.None; // CollisionFlags 초기화
     private Transform cam = null; // Camera.main.Transform 캐싱 준비
     private Animator _animator = null; // 애니메이터 캐싱 준비
 
+    private PlayerState _playerState = PlayerState.None;
 
+    public enum PlayerState
+    {
+        None = -1,
+        Idle,
+        Battle,
+        Zoom
+    }
 
     private void Awake()
     {
@@ -59,6 +74,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     private void Update()
     {
         Move();
+
+        Debug.DrawRay(target.position, target.transform.forward * 5f, Color.red);
     }
 
     private void LateUpdate()
@@ -121,12 +138,17 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
     private void BattleBodyRotate()
     {
+        // 배틀 모드일 때 돌리는 코드
+        // (머리 레이어만)  animation.Setfloat로 넣어
+        // FreeLookCamera의 X axis. Value
 
     }
 
 
     public void OnBattleReset()
     {
+        _playerState = PlayerState.Battle;
+
         transform.rotation = Quaternion.identity;
 
         CrossHairEnable(true);
@@ -138,7 +160,16 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
     public void OnIdleReset()
     {
+        _playerState = PlayerState.Idle;
+
         CrossHairEnable(false);
+    }
+
+    public void OnZoomReset()
+    {
+        OnBattleReset();
+
+        _playerState = PlayerState.Zoom;
     }
 
     private void CrossHairEnable(bool val)
@@ -160,6 +191,7 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         yield return new WaitForSeconds(time);
         _isBattle = false;
         _animator.SetBool("IsBattle", _isBattle);
+        OnIdle?.Invoke();
         Debug.Log("False");
     }
 }
