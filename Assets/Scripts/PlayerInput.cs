@@ -22,6 +22,16 @@ public class PlayerInput : MonoBehaviour
         if(Input.GetMouseButtonDown(0))
         {
             _playerMove.OnBattle?.Invoke();
+            _playerMove.Ani();
+        }
+        if(Input.GetMouseButtonDown(1))
+        {
+            _playerMove.OnZoom?.Invoke();
+            _playerMove.Ani();
+        }
+        if(Input.GetMouseButtonUp(1))
+        {
+            _playerMove.ExitZoom();
         }
     }
 

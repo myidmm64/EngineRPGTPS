@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using DG.Tweening;
 using static Define;
 
 public class PlayerMove : MonoBehaviour, IMoveAble
@@ -38,8 +39,12 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     private bool _isBattle = false; // true면 전투상태
     public bool IsBattle { get => _isBattle; set => _isBattle = value; } // _isBattle에 대한 get set 프로퍼티
 
+    [SerializeField]
+    private CinemachineFreeLook _cinemacine = null; // 감도 관련해서 갖고오기 위함
+    [SerializeField]
+    private CinemachineFollowZoom _zoom = null; // 줌 관련 갖고오기 위함
+
     private CharacterController _characterController = null; // 캐릭터 컨트롤러 캐싱 준비
-    private CinemachineFreeLook cinemacine = null; // 점호
     private CollisionFlags _collisionFlags = CollisionFlags.None; // CollisionFlags 초기화
     private Transform cam = null; // Camera.main.Transform 캐싱 준비
     private Animator _animator = null; // 애니메이터 캐싱 준비
@@ -69,13 +74,16 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     private void Start()
     {
         OnIdle?.Invoke();
+        Zoom();
+        ExitZoom();
     }
 
     private void Update()
     {
         Move();
+        //HeadRotate();
 
-        Debug.DrawRay(target.position, target.transform.forward * 5f, Color.red);
+        //Debug.DrawRay(target.position, target.transform.forward * 5f, Color.red);
     }
 
     private void LateUpdate()
@@ -121,8 +129,6 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         //몸을 돌리는 함수
         if (_isBattle == false)
             BodyRotate(amount);
-        else
-            BattleBodyRotate();
     }
 
     private void BodyRotate(Vector3 dir)
@@ -136,20 +142,27 @@ public class PlayerMove : MonoBehaviour, IMoveAble
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), _bodyRotateSpeed * Time.deltaTime);
     }
 
-    private void BattleBodyRotate()
+    private void HeadRotate()
     {
-        // 배틀 모드일 때 돌리는 코드
-        // (머리 레이어만)  animation.Setfloat로 넣어
-        // FreeLookCamera의 X axis. Value
+        switch(_playerState)
+        {
+            case PlayerState.None:
+                return;
+            case PlayerState.Idle:
+                return;
+        }
+        Quaternion rot;
+        rot = Quaternion.Euler(new Vector3(0f, 60f, 0f));
+        rot *= Quaternion.Euler(new Vector3(0f, _cinemacine.m_XAxis.Value, 0f));
 
+        Debug.Log(_cinemacine.m_XAxis.Value);
+        transform.rotation = rot;
     }
 
 
     public void OnBattleReset()
     {
         _playerState = PlayerState.Battle;
-
-        transform.rotation = Quaternion.identity;
 
         CrossHairEnable(true);
 
@@ -162,14 +175,33 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     {
         _playerState = PlayerState.Idle;
 
-        CrossHairEnable(false);
+        CrossHairEnable(false); 
     }
 
     public void OnZoomReset()
     {
         OnBattleReset();
 
+        Zoom();
+
         _playerState = PlayerState.Zoom;
+    }
+
+    public void Zoom()
+    {
+        // 감도 줌 감도로 바꾸기
+        _zoom.enabled = true;
+        _zoom.m_Width = 5f;
+    }
+
+    public void Ani()
+    {
+        _animator.SetTrigger("Shoot");
+    }
+
+    public void ExitZoom()
+    {
+        _zoom.enabled = false;
     }
 
     private void CrossHairEnable(bool val)
