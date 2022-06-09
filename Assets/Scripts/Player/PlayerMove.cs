@@ -25,16 +25,21 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     [SerializeField]
     private BoxCollider _atkCollider = null;
 
-    private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변스
+    private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변수
+    private Coroutine IsZoomCo = null; // IsZoomCoroutine을 담아둘 Coroutine 변수
 
     public UnityEvent OnBattle = null; // Battle 상태일 때 실행될 이벤트
     public UnityEvent OnIdle = null; // Battle 상태가 아닐 때 실행될 이벤트
     public UnityEvent OnZoom = null; // 우클릭을 눌렀을 때 실행될 이벤트
+    public UnityEvent OnZoomShoot = null; // 우클릭을 누르고 좌클릭을 눌렀을 때 실행될 이벤트
+    public UnityEvent OnDash = null; // 대시 키를 눌렀을 때 실행될 이벤트
 
     private bool _isStop = false; // true면 안움직임
     public bool IsStop { get => _isStop; set => _isStop = value; } // 인터페이스 구현
     private bool _isBattle = false; // true면 전투상태
     public bool IsBattle { get => _isBattle; set => _isBattle = value; } // _isBattle에 대한 get set 프로퍼티
+    private bool _isZoom = false;
+    public bool IsZoom { get => _isZoom; set => _isZoom = value; }
 
     [SerializeField]
     private CinemachineFreeLook _cinemacine = null; // 감도 관련해서 갖고오기 위함
@@ -87,15 +92,18 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     private void StateDoSomething()
     {
-        switch(_playerState)
+        switch (_playerState)
         {
             case PlayerState.None:
                 break;
             case PlayerState.Idle:
+                BodyRotate(amount);
                 break;
             case PlayerState.Battle:
+                HeadRotate();
                 break;
             case PlayerState.Zoom:
+                HeadRotate();
                 break;
             default:
                 break;
@@ -141,11 +149,6 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
         _collisionFlags = _characterController.Move(amount);
 
-        //몸을 돌리는 함수
-        if (_isBattle == false)
-            BodyRotate(amount);
-        else
-            HeadRotate();
     }
 
     /// <summary>
@@ -168,19 +171,16 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     private void HeadRotate()
     {
-        switch(_playerState)
-        {
-            case PlayerState.None:
-                return;
-            case PlayerState.Idle:
-                return;
-        }
         Quaternion rot = Quaternion.identity;
         //rot = Quaternion.Euler(new Vector3(0f, 60f, 0f));
         rot *= Quaternion.Euler(new Vector3(0f, _cinemacine.m_XAxis.Value, 0f));
 
-        Debug.Log(_cinemacine.m_XAxis.Value);
         transform.rotation = rot;
+    }
+
+    private void OffCollider()
+    {
+        _atkCollider.enabled = false;
     }
 
     /// <summary>
@@ -192,18 +192,18 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
         CrossHairEnable(false);
 
+
+        //바로 밑 코드 수정 필요
+        // 애니메이션 이벤트로 수정 !! 
         _atkCollider.enabled = true;
         Invoke("OffCollider", 0.5f);
+        //
 
         if (IsBattleCo != null)
             StopCoroutine(IsBattleCo);
         IsBattleCo = StartCoroutine(IsBattleCoroutine(_battleDuration));
     }
 
-    private void OffCollider()
-    {
-        _atkCollider.enabled = false;
-    }
 
     /// <summary>
     /// Idle 이벤트
@@ -211,6 +211,7 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     public void OnIdleReset()
     {
         IsBattle = false;
+        IsZoom = false;
 
         _playerState = PlayerState.Idle;
 
@@ -218,6 +219,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
         if (IsBattleCo != null)
             StopCoroutine(IsBattleCo);
+        if (IsZoomCo != null)
+            StopCoroutine(IsZoomCo);
     }
 
     /// <summary>
@@ -225,15 +228,26 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     public void OnZoomReset()
     {
+        //배틀 기능 다 멈춰주어야 함
+        _isBattle = false;
+        //애니메이션
 
         CrossHairEnable(true);
 
         Zoom();
 
         //밑 코드 수정 필요.
-        if (IsBattleCo != null)
-            StopCoroutine(IsBattleCo);
-        IsBattleCo = StartCoroutine(IsBattleCoroutine(_battleDuration));
+        if (IsZoomCo != null)
+            StopCoroutine(IsZoomCo);
+        IsZoomCo = StartCoroutine(IsZoomCoroutine(_battleDuration));
+    }
+
+    /// <summary>
+    /// 줌 샷 이벤트
+    /// </summary>
+    public void OnZoomShootReset()
+    {
+        Debug.Log("Shoot !!");
     }
 
     /// <summary>
@@ -252,13 +266,15 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     public void ExitZoom()
     {
-        if(IsBattle)
+        if(IsBattle) // 배틀 상태였다면 배틀로
         {
-            OnBattle?.Invoke();
+            _playerState = PlayerState.Battle;
         }
-        else
+        else // 아이들 상태였다면 아이들로
         {
-            OnIdle?.Invoke();
+            IsBattle = false;
+            IsZoom = false;
+            _playerState = PlayerState.Idle;
         }
 
         _zoom.enabled = false;
@@ -300,6 +316,22 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         _isBattle = false;
         _animator.SetBool("IsBattle", _isBattle);
         OnIdle?.Invoke();
+        Debug.Log("False");
+    }
+
+    /// <summary>
+    /// 줌 상태 변환
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
+    private IEnumerator IsZoomCoroutine(float time)
+    {
+        Debug.Log("IsZoom");
+        _isZoom = true;
+        yield return new WaitForSeconds(time);
+        _isZoom = false;
+        OnIdle?.Invoke();
+        ExitZoom();
         Debug.Log("False");
     }
 }

@@ -6,8 +6,8 @@ using UnityEngine;
 public class SkulMove : MonoBehaviour
 {
 
-    //스컬 상태
-    public enum SkullState
+    // 상태
+    public enum States
     {
         NONE,
         IDLE,
@@ -18,19 +18,21 @@ public class SkulMove : MonoBehaviour
         DAMAGE,
         DIE
     }
+
     [Header("기본속성")]
-    //해골 초기상태
-    public SkullState skullState = SkullState.NONE;
-    //해골 이동속도
+    // 스테이트 초기화
+    public States _state = States.NONE;
+    // 이동속도
     public float spdMove = 2f;
+    // 데미지 받았을 때 나오는 오브젝트
     [SerializeField]
     private GameObject damageObj = null;
-    //해골이 본 타겟
+    // 타겟
     public GameObject targetCharacter = null;
     public Transform targetTransform = null;
     public Vector3 posTarget = Vector3.zero;
-    private Animation skullAnimation = null;
-    private Transform skullTransform = null;
+    private Animation _animation = null;
+    private Transform _transform = null;
     [Header("애니메이션 클립")]
     public AnimationClip IdleAnimationClip = null;
     public AnimationClip MoveAnimaitonClip = null;
@@ -38,24 +40,28 @@ public class SkulMove : MonoBehaviour
     public AnimationClip DamageAnimationClip = null;
     public AnimationClip DieAnimationClip = null;
     [Header("전투속성")]
-    //체력
+    // 체력
     public int hp = 100;
-    //공격 거리
+    // 가거리
     public float AtkRange = 1.5f;
-    //해골 피격 이펙트
+    // 피격 이펙트
     public GameObject effectDamage = null;
+    // 죽음 이펙트
     public GameObject effectDie = null;
-    //해골 이동 반경
+    // 이동 반경
     public float moveRadius = 10f;
+    // 몸통 스킨메시렌더러
     [SerializeField]
     private SkinnedMeshRenderer skinnedMeshRenderer = null;
+    // 공격반경
     [SerializeField]
     private float attackDistance = 0.3f;
 
-    private Rigidbody _rigid = null;
+    private Rigidbody _rigid = null; // 캐싱 준비
 
     private bool _isAttack = false;
 
+    #region 애니메이션 이벤트
     private void OnAtkAnimationFinished()
     {
         Debug.Log("Atk animation Finished");
@@ -65,6 +71,7 @@ public class SkulMove : MonoBehaviour
     {
         skinnedMeshRenderer.material.color = Color.white;
         Debug.Log("Damage animation Finished");
+        _isAttack = false;
     }
     private void OnDieAnimationFinished()
     {
@@ -82,22 +89,25 @@ public class SkulMove : MonoBehaviour
         //이벤트 넣어줌
         clip.AddEvent(newAnimationEvent);
     }
+    #endregion
     private void Start()
     {
-        skullState = SkullState.IDLE;
-        skullTransform = GetComponent<Transform>();
-        skullAnimation = GetComponent<Animation>();
+        // 초기화
+        _state = States.IDLE;
+        // 캐싱
+        _transform = GetComponent<Transform>();
+        _animation = GetComponent<Animation>();
         _rigid = GetComponent<Rigidbody>();
 
-        skullAnimation[IdleAnimationClip.name].wrapMode = WrapMode.Loop;
-        skullAnimation[MoveAnimaitonClip.name].wrapMode = WrapMode.Loop;
-        skullAnimation[DieAnimationClip.name].wrapMode = WrapMode.Once;
-        skullAnimation[DieAnimationClip.name].layer = 10;
-        skullAnimation[DamageAnimationClip.name].wrapMode = WrapMode.Once;
-        //블랜딩 우선순서
-        skullAnimation[DamageAnimationClip.name].layer = 10;
-        skullAnimation[AttackAnimaitonClip.name].wrapMode = WrapMode.Once;
-        skullAnimation[AttackAnimaitonClip.name].speed = 1.5f;
+        // 애니메이션 초기화
+        _animation[IdleAnimationClip.name].wrapMode = WrapMode.Loop;
+        _animation[MoveAnimaitonClip.name].wrapMode = WrapMode.Loop;
+        _animation[DieAnimationClip.name].wrapMode = WrapMode.Once;
+        _animation[DieAnimationClip.name].layer = 10;
+        _animation[DamageAnimationClip.name].wrapMode = WrapMode.Once;
+        _animation[DamageAnimationClip.name].layer = 10;
+        _animation[AttackAnimaitonClip.name].wrapMode = WrapMode.Once;
+        _animation[AttackAnimaitonClip.name].speed = 1.5f;
 
         OnAnimationEvent(AttackAnimaitonClip, "OnAtkAnimationFinished");
         OnAnimationEvent(DamageAnimationClip, "OnDamageAnimationFinished");
@@ -110,30 +120,36 @@ public class SkulMove : MonoBehaviour
         CheckState();
         AnimationCtrl();
     }
+
+    private void StartInit()
+    {
+        Debug.Log("해골 이닛 시작");
+    }
+
     /// <summary>
     /// 해골 상태에 따라 동작을 제어하는 함수
     /// </summary>
     void CheckState()
     {
-        switch (skullState)
+        switch (_state)
         {
-            case SkullState.IDLE:
+            case States.IDLE:
                 _isAttack = false;
                 SetIdle();
                 break;
-            case SkullState.GOTARGET:
-            case SkullState.MOVE:
+            case States.GOTARGET:
+            case States.MOVE:
                 if(_isAttack == false)
                     SetMove();
                 break;
-            case SkullState.WAIT:
+            case States.WAIT:
                 break;
-            case SkullState.ATK:
+            case States.ATK:
                 SetAttack();
                 break;
-            case SkullState.DAMAGE:
+            case States.DAMAGE:
                 break;
-            case SkullState.DIE:
+            case States.DIE:
                 break;
             default:
                 break;
@@ -147,26 +163,26 @@ public class SkulMove : MonoBehaviour
     IEnumerator SetWait()
     {
         //해골 상태를 대기상태로 변경
-        skullState = SkullState.WAIT;
+        _state = States.WAIT;
         //대기하는 시간
         float timeWait = Random.Range(1f, 3f);
         //대기 시간을 넣어줘야함
         yield return new WaitForSeconds(timeWait);
-        skullState = SkullState.IDLE;
+        _state = States.IDLE;
     }
     void SetAttack()
     {
         Vector3 temp = targetTransform.position - transform.position;
         if (temp.magnitude > AtkRange * AtkRange + attackDistance)
         {
-            skullState = SkullState.GOTARGET;
+            _state = States.GOTARGET;
         }
 
-        float distance = Vector3.Distance(targetTransform.position, skullTransform.position);
+        float distance = Vector3.Distance(targetTransform.position, _transform.position);
 
         if (distance > AtkRange + attackDistance)
         {
-            skullState = SkullState.GOTARGET;
+            _state = States.GOTARGET;
         }
         //to be continue
     }
@@ -181,10 +197,10 @@ public class SkulMove : MonoBehaviour
 
         targetTransform = targetCharacter.transform;
 
-        skullState = SkullState.GOTARGET;
+        _state = States.GOTARGET;
     }
     /// <summary>
-    /// 해골 상태가 무브일 때 동작
+    /// 상태가 무브일 때 동작
     /// </summary>
     void SetMove()
     {
@@ -192,14 +208,14 @@ public class SkulMove : MonoBehaviour
         Vector3 distance = Vector3.zero;
         //방향
         Vector3 posLookAt = Vector3.zero;
-        switch (skullState)
+        switch (_state)
         {
-            case SkullState.MOVE:
+            case States.MOVE:
                 //타겟 없을 때
                 if (posTarget != Vector3.zero)
                 {
                     //차이 구하기
-                    distance = posTarget - skullTransform.position;
+                    distance = posTarget - _transform.position;
                     //만약 distance의 길이가 range보다 작으면
                     if (distance.magnitude < AtkRange)
                     {
@@ -207,24 +223,24 @@ public class SkulMove : MonoBehaviour
                         return;
                     }
                     //방향 구하기
-                    posLookAt = new Vector3(posTarget.x, skullTransform.position.y, posTarget.z);
+                    posLookAt = new Vector3(posTarget.x, _transform.position.y, posTarget.z);
                 }
                 break;
-            case SkullState.GOTARGET:
+            case States.GOTARGET:
                 //타겟 있을 때
                 if (targetCharacter != null)
                 {
                     //타겟과 차이
-                    distance = targetCharacter.transform.position - skullTransform.position;
+                    distance = targetCharacter.transform.position - _transform.position;
 
                     if (distance.magnitude < AtkRange)
                     {
-                        skullState = SkullState.ATK;
+                        _state = States.ATK;
                         return;
                     }
 
                     posLookAt = new Vector3(targetCharacter.transform.position.x,
-                        skullTransform.position.y,
+                        _transform.position.y,
                         targetCharacter.transform.position.z
                         );
                 }
@@ -233,30 +249,26 @@ public class SkulMove : MonoBehaviour
                 break;
         }
 
-        //해골이 이동할 방향은 크기가 없고 방향만
         Vector3 direction = distance.normalized;
 
         direction = new Vector3(direction.x, 0f, direction.z);
 
-        //이동량 방향
         Vector3 amount = direction * spdMove * Time.deltaTime;
 
-        //월드좌표 이동
-        skullTransform.Translate(amount, Space.World);
+        _transform.Translate(amount, Space.World);
 
-        //캐릭터 방향
-        skullTransform.LookAt(posLookAt);
+        _transform.LookAt(posLookAt);
     }
     /// <summary>
-    /// 해골 상태가 대기일 때 동작
+    /// 상태가 대기일 때 동작
     /// </summary>
     void SetIdle()
     {
         if (targetCharacter == null)
         {
-            posTarget = new Vector3(skullTransform.position.x + Random.Range(-moveRadius, moveRadius),
-                skullTransform.position.y + 1000f,
-                skullTransform.position.z + Random.Range(-moveRadius, moveRadius)
+            posTarget = new Vector3(_transform.position.x + Random.Range(-moveRadius, moveRadius),
+                _transform.position.y + 1000f,
+                _transform.position.z + Random.Range(-moveRadius, moveRadius)
                 );
             //레이캐스트 시작점 목표 방향
             Ray ray = new Ray(posTarget, Vector3.down);
@@ -268,14 +280,14 @@ public class SkulMove : MonoBehaviour
                 //임의의 목표 벡터에 높이값을 추가
                 posTarget.y = infoRaycast.point.y;
             }
-            //해골 상태를 무브로
-            skullState = SkullState.MOVE;
+            // 상태를 무브로
+            _state = States.MOVE;
         }
         else
         {
 
-            //해골 상태를 고타겟으로
-            skullState = SkullState.GOTARGET;
+            // 상태를 고타겟으로
+            _state = States.GOTARGET;
         }
     }
     /// <summary>
@@ -283,27 +295,27 @@ public class SkulMove : MonoBehaviour
     /// </summary>
     void AnimationCtrl()
     {
-        //해골 상태에 따라 애니메이션 적용
-        switch (skullState)
+        // 상태에 따라 애니메이션 적용
+        switch (_state)
         {
-            case SkullState.WAIT:
-            case SkullState.IDLE:
-                skullAnimation.CrossFade(IdleAnimationClip.name);
+            case States.WAIT:
+            case States.IDLE:
+                _animation.CrossFade(IdleAnimationClip.name);
                 break;
-            case SkullState.MOVE:
-            case SkullState.GOTARGET:
+            case States.MOVE:
+            case States.GOTARGET:
                 if(_isAttack == false)
-                    skullAnimation.CrossFade(MoveAnimaitonClip.name);
+                    _animation.CrossFade(MoveAnimaitonClip.name);
                 break;
-            case SkullState.ATK:
-                skullAnimation.CrossFade(AttackAnimaitonClip.name);
+            case States.ATK:
+                _animation.CrossFade(AttackAnimaitonClip.name);
                 _isAttack = true;
                 break;
-            case SkullState.DIE:
-                skullAnimation.CrossFade(DieAnimationClip.name);
+            case States.DIE:
+                _animation.CrossFade(DieAnimationClip.name);
                 break;
-            case SkullState.DAMAGE:
-                skullAnimation.CrossFade(IdleAnimationClip.name);
+            case States.DAMAGE:
+                _animation.CrossFade(IdleAnimationClip.name);
                 break;
             default:
                 break;
@@ -321,34 +333,42 @@ public class SkulMove : MonoBehaviour
             hp -= 10;
             if (hp > 0)
             {
-                Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation);
+                Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation); // 피격 이펙트 생성
 
-                skullAnimation.CrossFade(DamageAnimationClip.name);
+                _animation.CrossFade(DamageAnimationClip.name);
 
-                SendMessage("EffectDamageTween");
+                EffectDamageTween(); // 피격 이벤트 
 
-                _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse);
-                Invoke("ResetVelocity", 0.5f);
+                _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse); // 뒤 방향으로 넉백
+                Invoke("ResetVelocity", 0.5f); // 벨로시티 초기화하기
             }
             else
             {
-                skullState = SkullState.DIE;
-                Destroy(gameObject, DieAnimationClip.length - 0.15f);
+                _state = States.DIE;
+                Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
             }
         }
     }
 
     public void ResetVelocity() => _rigid.velocity = Vector3.zero;
 
+    /// <summary>
+    /// 맞았을 때 실행될 함수
+    /// </summary>
     private void EffectDamageTween()
     {
-        StartCoroutine(Damaged());
+        StartCoroutine(Damaged()); // 색깔을 바꾸는 함수
 
         damageObj.transform.position = transform.position;
         damageObj.SetActive(true);
-        damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false));
+        // 데미지 오브젝트 가져와서 올려준 후 다 올라갔으면 false
+        damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false)); 
     }
 
+    /// <summary>
+    /// 맞았을 때 실행될 함수 2
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator Damaged()
     {
         for(int i =0; i<4; i++)

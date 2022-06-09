@@ -56,11 +56,13 @@ public class PlayerInput : MonoBehaviour
         //왼쪽 클릭 시 배틀 이벤트
         if(Input.GetMouseButtonDown(0))
         {
-            _playerMove.OnBattle?.Invoke();
-            _playerMove.Ani();
+            if (_playerMove.IsZoom == false)
+                _playerMove.OnBattle?.Invoke();
+            else if (_playerMove.IsZoom == true)
+                _playerMove.OnZoomShoot?.Invoke();
         }
         //오른쪽 클릭 시 줌 이벤트
-        if(Input.GetMouseButtonDown(1))
+        else if(Input.GetMouseButtonDown(1))
         {
             _playerMove.OnZoom?.Invoke();
         }
