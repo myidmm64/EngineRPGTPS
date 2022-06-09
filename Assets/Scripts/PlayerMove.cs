@@ -5,15 +5,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using DG.Tweening;
 using static Define;
 
 public class PlayerMove : MonoBehaviour, IMoveAble
 {
-    [SerializeField]
-    private Transform target;
-
-
     [SerializeField]
     private float _speed = 5f; // 캐릭터의 이동속도
     [SerializeField]
@@ -27,6 +22,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     private Vector3 amount = Vector3.zero; // 이동에 대한 벡터값
     private float horizontal = 0f; // Input.GetAxisRaw("Horizontal")
     private float vertical = 0f; // Input.GetAxisRaw("Vertical")
+    [SerializeField]
+    private BoxCollider _atkCollider = null;
 
     private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변스
 
@@ -49,7 +46,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     private Transform cam = null; // Camera.main.Transform 캐싱 준비
     private Animator _animator = null; // 애니메이터 캐싱 준비
 
-    private PlayerState _playerState = PlayerState.None;
+    [SerializeField]
+    private PlayerState _playerState = PlayerState.None; // 플레이어 상태
 
     public enum PlayerState
     {
@@ -73,21 +71,35 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
     private void Start()
     {
+        // 초기화
         OnIdle?.Invoke();
-        Zoom();
         ExitZoom();
     }
 
     private void Update()
     {
         Move();
-        //HeadRotate();
-
-        //Debug.DrawRay(target.position, target.transform.forward * 5f, Color.red);
+        StateDoSomething();
     }
 
-    private void LateUpdate()
+    /// <summary>
+    /// 스테이트에 따라 실행할 것
+    /// </summary>
+    private void StateDoSomething()
     {
+        switch(_playerState)
+        {
+            case PlayerState.None:
+                break;
+            case PlayerState.Idle:
+                break;
+            case PlayerState.Battle:
+                break;
+            case PlayerState.Zoom:
+                break;
+            default:
+                break;
+        }
     }
 
     private void OnGUI()
@@ -102,6 +114,9 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         }
     }
 
+    /// <summary>
+    /// 캐릭터 이동 함수
+    /// </summary>
     public void Move()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
@@ -129,8 +144,14 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         //몸을 돌리는 함수
         if (_isBattle == false)
             BodyRotate(amount);
+        else
+            HeadRotate();
     }
 
+    /// <summary>
+    /// Battle 상태가 아닐 때 몸 돌리는 함수
+    /// </summary>
+    /// <param name="dir"></param>
     private void BodyRotate(Vector3 dir)
     {
         if (_isStop == true)
@@ -142,6 +163,9 @@ public class PlayerMove : MonoBehaviour, IMoveAble
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), _bodyRotateSpeed * Time.deltaTime);
     }
 
+    /// <summary>
+    /// Battle 상태일 때 몸 돌리는 함수
+    /// </summary>
     private void HeadRotate()
     {
         switch(_playerState)
@@ -151,60 +175,107 @@ public class PlayerMove : MonoBehaviour, IMoveAble
             case PlayerState.Idle:
                 return;
         }
-        Quaternion rot;
-        rot = Quaternion.Euler(new Vector3(0f, 60f, 0f));
+        Quaternion rot = Quaternion.identity;
+        //rot = Quaternion.Euler(new Vector3(0f, 60f, 0f));
         rot *= Quaternion.Euler(new Vector3(0f, _cinemacine.m_XAxis.Value, 0f));
 
         Debug.Log(_cinemacine.m_XAxis.Value);
         transform.rotation = rot;
     }
 
-
+    /// <summary>
+    /// 배틀 이벤트
+    /// </summary>
     public void OnBattleReset()
     {
         _playerState = PlayerState.Battle;
 
-        CrossHairEnable(true);
+        CrossHairEnable(false);
+
+        _atkCollider.enabled = true;
+        Invoke("OffCollider", 0.5f);
 
         if (IsBattleCo != null)
             StopCoroutine(IsBattleCo);
         IsBattleCo = StartCoroutine(IsBattleCoroutine(_battleDuration));
     }
 
-    public void OnIdleReset()
+    private void OffCollider()
     {
-        _playerState = PlayerState.Idle;
-
-        CrossHairEnable(false); 
+        _atkCollider.enabled = false;
     }
 
+    /// <summary>
+    /// Idle 이벤트
+    /// </summary>
+    public void OnIdleReset()
+    {
+        IsBattle = false;
+
+        _playerState = PlayerState.Idle;
+
+        CrossHairEnable(false);
+
+        if (IsBattleCo != null)
+            StopCoroutine(IsBattleCo);
+    }
+
+    /// <summary>
+    /// 줌 이벤트
+    /// </summary>
     public void OnZoomReset()
     {
-        OnBattleReset();
+
+        CrossHairEnable(true);
 
         Zoom();
 
-        _playerState = PlayerState.Zoom;
+        //밑 코드 수정 필요.
+        if (IsBattleCo != null)
+            StopCoroutine(IsBattleCo);
+        IsBattleCo = StartCoroutine(IsBattleCoroutine(_battleDuration));
     }
 
+    /// <summary>
+    /// 줌인 하는 함수
+    /// </summary>
     public void Zoom()
     {
+        _playerState = PlayerState.Zoom;
         // 감도 줌 감도로 바꾸기
         _zoom.enabled = true;
         _zoom.m_Width = 5f;
     }
 
+    /// <summary>
+    /// 줌 아웃 함수
+    /// </summary>
+    public void ExitZoom()
+    {
+        if(IsBattle)
+        {
+            OnBattle?.Invoke();
+        }
+        else
+        {
+            OnIdle?.Invoke();
+        }
+
+        _zoom.enabled = false;
+    }
+
+
+    //임시 코드
     public void Ani()
     {
         _animator.SetTrigger("Shoot");
     }
 
-    public void ExitZoom()
-    {
-        _zoom.enabled = false;
-    }
-
-    private void CrossHairEnable(bool val)
+    /// <summary>
+    /// 조준점 액티브
+    /// </summary>
+    /// <param name="val"></param>
+    public void CrossHairEnable(bool val)
     {
         _crossHair.enabled = val;
         Image[] crossHairsChildren = null;
@@ -215,6 +286,11 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         }
     }
 
+    /// <summary>
+    /// 배틀 상태 변환
+    /// </summary>
+    /// <param name="time"></param>
+    /// <returns></returns>
     private IEnumerator IsBattleCoroutine(float time)
     {
         Debug.Log("IsBattle");

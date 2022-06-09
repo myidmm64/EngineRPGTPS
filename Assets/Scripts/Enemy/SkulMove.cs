@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,8 @@ public class SkulMove : MonoBehaviour
     public SkullState skullState = SkullState.NONE;
     //해골 이동속도
     public float spdMove = 2f;
+    [SerializeField]
+    private GameObject damageObj = null;
     //해골이 본 타겟
     public GameObject targetCharacter = null;
     public Transform targetTransform = null;
@@ -49,6 +52,8 @@ public class SkulMove : MonoBehaviour
     [SerializeField]
     private float attackDistance = 0.3f;
 
+    private Rigidbody _rigid = null;
+
     private bool _isAttack = false;
 
     private void OnAtkAnimationFinished()
@@ -64,6 +69,7 @@ public class SkulMove : MonoBehaviour
     private void OnDieAnimationFinished()
     {
         Debug.Log("Die animation Finished");
+        Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation);
     }
     void OnAnimationEvent(AnimationClip clip, string funcNmae)
     {
@@ -72,7 +78,7 @@ public class SkulMove : MonoBehaviour
         //이벤트 함수 연결
         newAnimationEvent.functionName = funcNmae;
         //끝나기 직전에 호출
-        newAnimationEvent.time = clip.length - 0.5f;
+        newAnimationEvent.time = clip.length - 0.2f;
         //이벤트 넣어줌
         clip.AddEvent(newAnimationEvent);
     }
@@ -81,6 +87,7 @@ public class SkulMove : MonoBehaviour
         skullState = SkullState.IDLE;
         skullTransform = GetComponent<Transform>();
         skullAnimation = GetComponent<Animation>();
+        _rigid = GetComponent<Rigidbody>();
 
         skullAnimation[IdleAnimationClip.name].wrapMode = WrapMode.Loop;
         skullAnimation[MoveAnimaitonClip.name].wrapMode = WrapMode.Loop;
@@ -96,6 +103,7 @@ public class SkulMove : MonoBehaviour
         OnAnimationEvent(DamageAnimationClip, "OnDamageAnimationFinished");
         OnAnimationEvent(DieAnimationClip, "OnDieAnimationFinished");
 
+        damageObj.SetActive(false);
     }
     private void Update()
     {
@@ -313,20 +321,42 @@ public class SkulMove : MonoBehaviour
             hp -= 10;
             if (hp > 0)
             {
-                Instantiate(effectDamage, other.transform.position, Quaternion.identity);
+                Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation);
 
                 skullAnimation.CrossFade(DamageAnimationClip.name);
 
-                EffectDamageTween();
+                SendMessage("EffectDamageTween");
+
+                _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse);
+                Invoke("ResetVelocity", 0.5f);
             }
             else
             {
                 skullState = SkullState.DIE;
+                Destroy(gameObject, DieAnimationClip.length - 0.15f);
             }
         }
-
     }
+
+    public void ResetVelocity() => _rigid.velocity = Vector3.zero;
+
     private void EffectDamageTween()
     {
+        StartCoroutine(Damaged());
+
+        damageObj.transform.position = transform.position;
+        damageObj.SetActive(true);
+        damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false));
+    }
+
+    private IEnumerator Damaged()
+    {
+        for(int i =0; i<4; i++)
+        {
+            skinnedMeshRenderer.material.color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            skinnedMeshRenderer.material.color = Color.white;
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }
