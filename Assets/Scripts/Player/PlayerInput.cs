@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 public class PlayerInput : MonoBehaviour
 {
-    private PlayerMove _playerMove = null;
+    private Player _playerMove = null;
 
     [field:SerializeField]
     private UnityEvent OnEscapeButton = null;
@@ -17,7 +17,7 @@ public class PlayerInput : MonoBehaviour
 
     private void Awake()
     {
-        _playerMove = GetComponent<PlayerMove>();
+        _playerMove = GetComponent<Player>();
     }
 
     private void Start()
@@ -56,19 +56,25 @@ public class PlayerInput : MonoBehaviour
         //왼쪽 클릭 시 배틀 이벤트
         if(Input.GetMouseButtonDown(0))
         {
-            if (_playerMove.IsZoom == false)
+            if (_playerMove.IsRun) return;
+
+            if (_playerMove.IsZoom == false) // 줌을 안했으면 그냥 근접공격
                 _playerMove.OnBattle?.Invoke();
-            else if (_playerMove.IsZoom == true)
+            else if (_playerMove.IsZoom == true) // 만약 줌을 하고있었다면 줌샷
                 _playerMove.OnZoomShoot?.Invoke();
         }
         //오른쪽 클릭 시 줌 이벤트
         else if(Input.GetMouseButtonDown(1))
         {
+            if (_playerMove.IsRun) return;
+
             _playerMove.OnZoom?.Invoke();
         }
         //오른쪽 클릭 해제 시 줌 해제
         if(Input.GetMouseButtonUp(1))
         {
+            if (_playerMove.IsRun) return;
+
             _playerMove.ExitZoom();
             _playerMove.CrossHairEnable(false);
         }

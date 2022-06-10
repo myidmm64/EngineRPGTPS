@@ -7,10 +7,12 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using static Define;
 
-public class PlayerMove : MonoBehaviour, IMoveAble
+public class Player : MonoBehaviour, IMoveAble
 {
     [SerializeField]
     private float _speed = 5f; // 캐릭터의 이동속도
+    [SerializeField]
+    private float _runSpeed = 10f;
     [SerializeField]
     private Vector3 _gravityScale = new Vector3(0f, 9.8f, 0f); // 공중에 떠있을 때 중력값
     [SerializeField]
@@ -40,6 +42,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     public bool IsBattle { get => _isBattle; set => _isBattle = value; } // _isBattle에 대한 get set 프로퍼티
     private bool _isZoom = false;
     public bool IsZoom { get => _isZoom; set => _isZoom = value; }
+    private bool _isRun = false;
+    public bool IsRun { get => _isRun; set => _isRun = value; }
 
     [SerializeField]
     private CinemachineFreeLook _cinemacine = null; // 감도 관련해서 갖고오기 위함
@@ -142,7 +146,8 @@ public class PlayerMove : MonoBehaviour, IMoveAble
         Vector3 forward = cam.TransformDirection(Vector3.forward);
         forward.y = 0f;
         Vector3 right = new Vector3(forward.z , 0f , -forward.x);
-        amount = (forward * vertical + right * horizontal) * _speed * Time.deltaTime;
+        amount = (forward * vertical + right * horizontal) * Time.deltaTime;
+        amount *= IsRun ? _runSpeed : _speed;
 
         if (_collisionFlags == CollisionFlags.None)
             amount -= _gravityScale * Time.deltaTime;
@@ -236,7 +241,6 @@ public class PlayerMove : MonoBehaviour, IMoveAble
 
         Zoom();
 
-        //밑 코드 수정 필요.
         if (IsZoomCo != null)
             StopCoroutine(IsZoomCo);
         IsZoomCo = StartCoroutine(IsZoomCoroutine(_battleDuration));
@@ -247,6 +251,10 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     public void OnZoomShootReset()
     {
+        if (IsZoomCo != null)
+            StopCoroutine(IsZoomCo);
+        IsZoomCo = StartCoroutine(IsZoomCoroutine(_battleDuration));
+
         Debug.Log("Shoot !!");
     }
 
@@ -266,7 +274,10 @@ public class PlayerMove : MonoBehaviour, IMoveAble
     /// </summary>
     public void ExitZoom()
     {
-        if(IsBattle) // 배틀 상태였다면 배틀로
+        if (IsZoomCo != null)
+            StopCoroutine(IsZoomCo);
+
+        if (IsBattle) // 배틀 상태였다면 배틀로
         {
             _playerState = PlayerState.Battle;
         }
