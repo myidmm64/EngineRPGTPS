@@ -1381,7 +1381,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 232099852938550395}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 7, y: 7, z: 7}
   m_ConstrainProportionsScale: 1
@@ -1473,6 +1473,7 @@ MonoBehaviour:
   effectDie: {fileID: 139366, guid: b185c1a9cf067374586d095111b15bd1, type: 3}
   moveRadius: 10
   skinnedMeshRenderer: {fileID: 232099852924883255}
+  _atkCollider: {fileID: 1836272887}
   attackDistance: 0.3
 --- !u!1 &232099852938550397
 GameObject:
@@ -1515,9 +1516,10 @@ GameObject:
   m_Component:
   - component: {fileID: 232099852938707039}
   - component: {fileID: 232099852924883253}
+  - component: {fileID: 1836272887}
   m_Layer: 0
   m_Name: Object01
-  m_TagString: Untagged
+  m_TagString: EnemyAtk
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1591,6 +1593,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0014118575, y: 0.000021925196, z: 0.040557608}
     m_Extent: {x: 0.0124346055, y: 0.006705289, z: 0.05640191}
   m_DirtyAABB: 0
+--- !u!65 &1836272887
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232099852938550399}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 0.013410815, y: 0.11352985, z: 0.028402884}
+  m_Center: {x: -0.000000058582373, y: -0.038812894, z: 0.002510216}
 --- !u!1 &232099852953408962
 GameObject:
   m_ObjectHideFlags: 0

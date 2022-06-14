@@ -53,6 +53,10 @@ public class SkulMove : MonoBehaviour
     // 몸통 스킨메시렌더러
     [SerializeField]
     private SkinnedMeshRenderer skinnedMeshRenderer = null;
+
+    // 공격 어택
+    [SerializeField]
+    private BoxCollider _atkCollider = null;
     // 공격반경
     [SerializeField]
     private float attackDistance = 0.3f;
@@ -66,6 +70,7 @@ public class SkulMove : MonoBehaviour
     {
         Debug.Log("Atk animation Finished");
         _isAttack = false;
+        _atkCollider.enabled = false;
     }
     private void OnDamageAnimationFinished()
     {
@@ -310,6 +315,7 @@ public class SkulMove : MonoBehaviour
             case States.ATK:
                 _animation.CrossFade(AttackAnimaitonClip.name);
                 _isAttack = true;
+                _atkCollider.enabled = true;
                 break;
             case States.DIE:
                 _animation.CrossFade(DieAnimationClip.name);
@@ -344,8 +350,14 @@ public class SkulMove : MonoBehaviour
             }
             else
             {
+                if (_state == States.DIE)
+                    return;
                 _state = States.DIE;
                 Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
+                Player player = targetTransform.GetComponent<Player>();
+                if (player != null)
+                    player.Coin++;
+
             }
         }
     }

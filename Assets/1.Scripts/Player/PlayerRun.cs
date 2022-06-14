@@ -4,27 +4,29 @@ using UnityEngine;
 
 public class PlayerRun : MonoBehaviour
 {
-    private Player _playerMove = null;
+    private Player _player = null;
     private Animator _animator = null;
 
     private void Awake()
     {
         _animator = GetComponent<Animator>();
-        _playerMove = GetComponent<Player>();
+        _player = GetComponent<Player>();
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            _playerMove.OnIdle?.Invoke();
-            _playerMove.ExitZoom();
-            _playerMove.IsRun = true;
+            _player.OnIdle?.Invoke();
+            _player.ExitZoom();
+            _player.SetState(Player.PlayerState.Run);
+            _player.IsRun = true;
             _animator.SetBool("IsRun", true);
         }
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
-            _playerMove.IsRun = false;
+            _player.SetState(Player.PlayerState.Idle);
+            _player.IsRun = false;
             _animator.SetBool("IsRun", false);
         }
     }
