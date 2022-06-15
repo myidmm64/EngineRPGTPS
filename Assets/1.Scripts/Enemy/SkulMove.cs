@@ -328,37 +328,32 @@ public class SkulMove : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 피격
-    /// </summary>
-    /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)
+    //피격 함수
+
+    public void Damage()
     {
-        if (other.CompareTag("PlayerAtk"))
+        hp -= 10;
+        if (hp > 0)
         {
-            hp -= 10;
-            if (hp > 0)
-            {
-                Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation); // 피격 이펙트 생성
+            Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation); // 피격 이펙트 생성
 
-                _animation.CrossFade(DamageAnimationClip.name);
+            _animation.CrossFade(DamageAnimationClip.name);
 
-                EffectDamageTween(); // 피격 이벤트 
+            EffectDamageTween(); // 피격 이벤트 
 
-                _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse); // 뒤 방향으로 넉백
-                Invoke("ResetVelocity", 0.5f); // 벨로시티 초기화하기
-            }
-            else
-            {
-                if (_state == States.DIE)
-                    return;
-                _state = States.DIE;
-                Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
-                Player player = targetTransform.GetComponent<Player>();
-                if (player != null)
-                    player.Coin++;
+            _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse); // 뒤 방향으로 넉백
+            Invoke("ResetVelocity", 0.5f); // 벨로시티 초기화하기
+        }
+        else
+        {
+            if (_state == States.DIE)
+                return;
+            _state = States.DIE;
+            Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
+            Player player = targetTransform.GetComponent<Player>();
+            if (player != null)
+                player.Coin++;
 
-            }
         }
     }
 
