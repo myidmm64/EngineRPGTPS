@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerInput : MonoBehaviour
+public class PlayerInputs : MonoBehaviour
 {
     private Player _playerMove = null;
 
@@ -49,12 +49,14 @@ public class PlayerInput : MonoBehaviour
             {
                 _isMarketOpen = false;
                 _market.SetActive(false);
+                Cursor.visible = false;
                 Time.timeScale = 1f;
             }
             else // ¿­±â
             {
                 _isMarketOpen = true;
                 _market.SetActive(true);
+                Cursor.visible = true;
                 Time.timeScale = 0f;
             }
         }
