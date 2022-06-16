@@ -81,6 +81,7 @@ public class SkulMove : MonoBehaviour
     private void OnDieAnimationFinished()
     {
         Debug.Log("Die animation Finished");
+
         Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation);
     }
     void OnAnimationEvent(AnimationClip clip, string funcNmae)
@@ -108,17 +109,18 @@ public class SkulMove : MonoBehaviour
         _animation[IdleAnimationClip.name].wrapMode = WrapMode.Loop;
         _animation[MoveAnimaitonClip.name].wrapMode = WrapMode.Loop;
         _animation[DieAnimationClip.name].wrapMode = WrapMode.Once;
-        _animation[DieAnimationClip.name].layer = 10;
+        _animation[DieAnimationClip.name].layer = 5;
         _animation[DamageAnimationClip.name].wrapMode = WrapMode.Once;
-        _animation[DamageAnimationClip.name].layer = 10;
+        _animation[DamageAnimationClip.name].layer = 5;
         _animation[AttackAnimaitonClip.name].wrapMode = WrapMode.Once;
+        _animation[DamageAnimationClip.name].layer = 10;
         _animation[AttackAnimaitonClip.name].speed = 1.5f;
 
         OnAnimationEvent(AttackAnimaitonClip, "OnAtkAnimationFinished");
         OnAnimationEvent(DamageAnimationClip, "OnDamageAnimationFinished");
         OnAnimationEvent(DieAnimationClip, "OnDieAnimationFinished");
 
-        damageObj.SetActive(false);
+        spdMove = Random.Range(spdMove - 1f, spdMove + 1f);
     }
     private void Update()
     {
@@ -341,7 +343,7 @@ public class SkulMove : MonoBehaviour
 
             EffectDamageTween(); // 피격 이벤트 
 
-            _rigid.AddForce(transform.forward * -1 * 3f, ForceMode.Impulse); // 뒤 방향으로 넉백
+            _rigid.AddForce(transform.forward * -1 * 0f, ForceMode.Impulse); // 뒤 방향으로 넉백
             Invoke("ResetVelocity", 0.5f); // 벨로시티 초기화하기
         }
         else
@@ -350,10 +352,11 @@ public class SkulMove : MonoBehaviour
                 return;
             _state = States.DIE;
             Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
-            Player player = targetTransform.GetComponent<Player>();
-            if (player != null)
-                player.Coin++;
 
+            GameObject obj = Instantiate(damageObj, transform.position + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
+            obj.transform.SetParent(null);
+            obj.SetActive(true);
+            obj.transform.DOMoveY(transform.position.y + 1f, 1f);
         }
     }
 
@@ -366,10 +369,9 @@ public class SkulMove : MonoBehaviour
     {
         StartCoroutine(Damaged()); // 색깔을 바꾸는 함수
 
-        damageObj.transform.position = transform.position;
-        damageObj.SetActive(true);
+
         // 데미지 오브젝트 가져와서 올려준 후 다 올라갔으면 false
-        damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false)); 
+        //damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false)); 
     }
 
     /// <summary>

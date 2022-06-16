@@ -10,10 +10,16 @@ public class PlayerInput : MonoBehaviour
 
     [field:SerializeField]
     private UnityEvent OnEscapeButton = null;
+    [field: SerializeField]
+    private UnityEvent OnTapButton = null;
 
     [SerializeField]
     private GameObject _option = null;
+    [SerializeField]
+    private GameObject _market = null;
+
     private bool _isOpenUI = false;
+    private bool _isMarketOpen = false;
 
     private void Awake()
     {
@@ -23,6 +29,7 @@ public class PlayerInput : MonoBehaviour
     private void Start()
     {
         _option.SetActive(false);
+        _market.SetActive(false);
     }
 
     private void Update()
@@ -30,6 +37,27 @@ public class PlayerInput : MonoBehaviour
         BattleFunc();
 
         VisibleMenu();
+
+        VisibleMarket();
+    }
+
+    private void VisibleMarket()
+    {
+        if(Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (_isMarketOpen) // 닫기
+            {
+                _isMarketOpen = false;
+                _market.SetActive(false);
+                Time.timeScale = 1f;
+            }
+            else // 열기
+            {
+                _isMarketOpen = true;
+                _market.SetActive(true);
+                Time.timeScale = 0f;
+            }
+        }
     }
 
     private void VisibleMenu()
@@ -59,7 +87,10 @@ public class PlayerInput : MonoBehaviour
             if (_playerMove.IsRun || _playerMove.IsFreeze || _playerMove.IsAttackAble == false) return;
 
             if (_playerMove.IsZoom == false) // 줌을 안했으면 그냥 근접공격
+            {
+                _playerMove.IsAttackAble = false;
                 _playerMove.OnBattle?.Invoke();
+            }
             else if (_playerMove.IsZoom == true) // 만약 줌을 하고있었다면 줌샷 
                 _playerMove.OnZoomShoot?.Invoke();
         }

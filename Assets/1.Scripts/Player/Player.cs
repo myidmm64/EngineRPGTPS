@@ -143,12 +143,13 @@ public class Player : MonoBehaviour, IMoveAble
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
         gUI.fontStyle = FontStyle.Bold;
-        GUI.Label(new Rect(10, 10, 100 , 200), $"CollisionFlags : {_collisionFlags}", gUI);
         GUI.Label(new Rect(10, 60, 100, 200), $"Coin : {Coin}", gUI);
-        if (GUI.Button(new Rect(10,100,600,80), $"캐릭터에 대해 무언가 하는 버튼", gUI))
-        {
-            Debug.Log("버튼 누름 !!");
-        }
+
+
+        //if (GUI.Button(new Rect(10,100,600,80), $"캐릭터에 대해 무언가 하는 버튼", gUI))
+        //{
+        //    Debug.Log("버튼 누름 !!");
+        //}
     }
 
     /// <summary>
@@ -229,7 +230,6 @@ public class Player : MonoBehaviour, IMoveAble
         _atkCollider.enabled = true;
         IsFreeze = true;
         IsAttackAble = false;
-        Debug.Log("잘 됨");
     }
 
     public void SwordAttackEnd()
@@ -237,7 +237,6 @@ public class Player : MonoBehaviour, IMoveAble
         _atkCollider.enabled = false;
         IsFreeze = false;
         IsAttackAble = true;
-        Debug.Log("잘 안됨");
     }
 
     /// <summary>
@@ -251,9 +250,7 @@ public class Player : MonoBehaviour, IMoveAble
         CrossHairEnable(false);
 
 
-        //바로 밑 코드 수정 필요
-        // 애니메이션 이벤트로 수정 !! 
-        //
+        HeadRotate();
 
         if (IsZoomCo != null)
             StopCoroutine(IsZoomCo);
@@ -396,14 +393,12 @@ public class Player : MonoBehaviour, IMoveAble
     /// <returns></returns>
     private IEnumerator IsBattleCoroutine(float time)
     {
-        Debug.Log("IsBattle");
         _isBattle = true;
         _animator.SetBool("IsBattle", _isBattle);
         yield return new WaitForSeconds(time);
         _isBattle = false;
         _animator.SetBool("IsBattle", _isBattle);
         OnIdle?.Invoke();
-        Debug.Log("False");
     }
 
     /// <summary>
@@ -413,13 +408,13 @@ public class Player : MonoBehaviour, IMoveAble
     /// <returns></returns>
     private IEnumerator IsZoomCoroutine(float time)
     {
-        Debug.Log("IsZoom");
         _isZoom = true;
+        _animator.SetBool("IsBattle", _isZoom);
         yield return new WaitForSeconds(time);
         _isZoom = false;
+        _animator.SetBool("IsBattle", _isZoom);
         OnIdle?.Invoke();
         ExitZoom();
-        Debug.Log("False");
     }
 
     public void SetState(PlayerState state)

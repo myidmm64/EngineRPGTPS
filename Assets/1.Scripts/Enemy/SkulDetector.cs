@@ -8,7 +8,6 @@ public class SkulDetector : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {
-            Debug.Log("적 감지 !! 이름 : " + other.name);
             SendMessageUpwards("OnCkTarget", other.gameObject);
         }
     }

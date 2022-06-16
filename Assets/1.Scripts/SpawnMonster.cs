@@ -13,21 +13,27 @@ public class SpawnMonster : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (isSpwan == false)
+        if (other.CompareTag("Player"))
         {
-            isSpwan = true;
-            StartCoroutine(Spawn());
+            if (isSpwan == false)
+            {
+                isSpwan = true;
+                StartCoroutine(Spawn(other.gameObject));
+            }
         }
     }
 
-    private IEnumerator Spawn()
+    private IEnumerator Spawn(GameObject target)
     {
         for(int i =0; i<spawnPoints.Count; i++)
         {
             int random = Random.Range(0, monsters.Count);
-            Instantiate(monsters[random], spawnPoints[i].position, Quaternion.identity);
+            GameObject monster = Instantiate(monsters[random], spawnPoints[i].position, Quaternion.identity);
+            monster.SendMessage("OnCkTarget", target);
             yield return new WaitForSeconds(0.2f);
         }
+
+        yield return new WaitForSeconds(1f);
         Destroy(gameObject);
     }
 }

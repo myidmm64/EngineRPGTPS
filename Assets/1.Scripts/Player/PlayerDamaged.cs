@@ -6,6 +6,7 @@ public class PlayerDamaged : MonoBehaviour
 {
     [SerializeField]
     private int _hp = 10;
+    public int HP { get => _hp; set => _hp = value; }
     [SerializeField]
     private float _damageDelay = 1f; // ¸Â´Â µô·¹ÀÌ
 
@@ -17,12 +18,27 @@ public class PlayerDamaged : MonoBehaviour
         _animator = GetComponent<Animator>();
     }
 
+    private void OnGUI()
+    {
+        GUIStyle gUI = new GUIStyle();
+        gUI.fontSize = 50;
+        gUI.fontStyle = FontStyle.Bold;
+        GUI.Label(new Rect(10, 10, 100, 200), $"HP : {_hp}", gUI);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("EnemyAtk"))
         {
             if (_isDamage == false)
             {
+                _hp -= 1;
+                if(_hp <= 0)
+                {
+
+                    return;
+                }
+
                 StartCoroutine(DamageCoroutine());
             }
         }
