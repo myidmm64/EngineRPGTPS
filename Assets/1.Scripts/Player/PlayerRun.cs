@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerRun : MonoBehaviour
 {
-    private Player _player = null;
-    private Animator _animator = null;
+    private Player _player = null; // 플레이어 캐싱 준비
+    private Animator _animator = null; // 애니메이터 캐싱 준비
 
     private void Awake()
     {
@@ -15,7 +15,7 @@ public class PlayerRun : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift)) // 왼쪽 시프트를 누르고있을 때 달리기
         {
             _player.OnIdle?.Invoke();
             _player.ExitZoom();

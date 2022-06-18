@@ -19,4 +19,32 @@ public class Define : MonoBehaviour
             return _mainCam;
         }
     }
+
+    private static Player _player = null;
+
+    public static Player player
+    {
+        get
+        {
+            if (_player == null)
+            {
+                _player = GameObject.Find("Player").GetComponent<Player>();
+            }
+            return _player;
+        }
+    }
+
+
+    private static NightChanger _nightChanger = null;
+    public static NightChanger nightChanger
+    {
+        get
+        {
+            if (_nightChanger == null)
+            {
+                _nightChanger = GameObject.Find("WorldLight").GetComponent<NightChanger>();
+            }
+            return _nightChanger;
+        }
+    }
 }

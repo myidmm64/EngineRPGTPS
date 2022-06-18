@@ -6,28 +6,31 @@ using UnityEngine.Events;
 
 public class PlayerInputs : MonoBehaviour
 {
-    private Player _playerMove = null;
+    private Player _playerMove = null; // 플레이어 캐싱준비
+    private PlayerUseSkill _playerUseSkill = null; // 플레이어 캐싱 준비
 
     [field:SerializeField]
-    private UnityEvent OnEscapeButton = null;
+    private UnityEvent OnEscapeButton = null; // esc 버튼이 눌렸을 때 발행될 이벤트
     [field: SerializeField]
-    private UnityEvent OnTapButton = null;
+    private UnityEvent OnTapButton = null; // tab 버튼이 눌렸을 때 발행될 이벤트
 
     [SerializeField]
-    private GameObject _option = null;
+    private GameObject _option = null; // 옵션창
     [SerializeField]
-    private GameObject _market = null;
+    private GameObject _market = null; // 상점창
 
-    private bool _isOpenUI = false;
-    private bool _isMarketOpen = false;
+    private bool _isOpenUI = false; // 옵션 UI를 열고있는가?
+    private bool _isMarketOpen = false; // 상점 UI를 열고 있는가?
 
     private void Awake()
     {
         _playerMove = GetComponent<Player>();
+        _playerUseSkill = GetComponent<PlayerUseSkill>();
     }
 
     private void Start()
     {
+        //초기화
         _option.SetActive(false);
         _market.SetActive(false);
     }
@@ -41,6 +44,9 @@ public class PlayerInputs : MonoBehaviour
         VisibleMarket();
     }
 
+    /// <summary>
+    /// 상점 띄우기
+    /// </summary>
     private void VisibleMarket()
     {
         if(Input.GetKeyDown(KeyCode.Tab))
@@ -62,6 +68,9 @@ public class PlayerInputs : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 옵션 띄우기
+    /// </summary>
     private void VisibleMenu()
     {
         if(Input.GetKeyDown(KeyCode.Escape))
@@ -81,12 +90,15 @@ public class PlayerInputs : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 전투 인풋 받기
+    /// </summary>
     private void BattleFunc()
     {
         //왼쪽 클릭 시 배틀 이벤트
         if(Input.GetMouseButtonDown(0))
         {
-            if (_playerMove.IsRun || _playerMove.IsFreeze || _playerMove.IsAttackAble == false) return;
+            if (_playerMove.IsRun || _playerMove.IsFreeze || _playerMove.IsAttackAble == false) return; // 공격 가능한가?
 
             if (_playerMove.IsZoom == false) // 줌을 안했으면 그냥 근접공격
             {
@@ -94,7 +106,12 @@ public class PlayerInputs : MonoBehaviour
                 _playerMove.OnBattle?.Invoke();
             }
             else if (_playerMove.IsZoom == true && _playerMove.IsZoomAttackAble) // 만약 줌을 하고있었다면 줌샷 
+            {
+                if (_playerUseSkill.MP <= 0) // 마나가 없으면 실행 안함
+                    return;
+                _playerUseSkill.MP-=1; // 줌샷을 할 때 마나 감소
                 _playerMove.OnZoomShoot?.Invoke();
+            }
         }
         //오른쪽 클릭 시 줌 이벤트
         else if(Input.GetMouseButtonDown(1))

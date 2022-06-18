@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerUseSkill : MonoBehaviour
 {
     [SerializeField]
-    private int _mp = 10;
+    private int _mp = 10; // ¸¶³ª
     public int MP { get => _mp; set => _mp = value; }
 
 
@@ -14,6 +14,7 @@ public class PlayerUseSkill : MonoBehaviour
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
         gUI.fontStyle = FontStyle.Bold;
-        GUI.Label(new Rect(10, 40, 100, 200), $"MP : {_mp}", gUI);
+        gUI.normal.textColor = Color.red;
+        GUI.Label(new Rect(10, 20, 100, 200), $"MP : {_mp}", gUI);
     }
 }

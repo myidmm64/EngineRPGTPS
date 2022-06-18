@@ -1,7 +1,11 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using static Define;
+using Random = UnityEngine.Random;
 
 public class SkulMove : MonoBehaviour
 {
@@ -20,19 +24,17 @@ public class SkulMove : MonoBehaviour
     }
 
     [Header("기본속성")]
-    // 스테이트 초기화
-    public States _state = States.NONE;
-    // 이동속도
-    public float spdMove = 2f;
-    // 데미지 받았을 때 나오는 오브젝트
+    public States _state = States.NONE; // 스테이트 초기화
+    public float spdMove = 2f; // 이동속도
     [SerializeField]
-    private GameObject damageObj = null;
-    // 타겟
-    public GameObject targetCharacter = null;
-    public Transform targetTransform = null;
-    public Vector3 posTarget = Vector3.zero;
+    private GameObject damageObj = null; // 데미지를 받앗을 때 나오는 오브젝트
+
+    public GameObject targetCharacter = null; // 타겟
+    public Transform targetTransform = null; 
+    public Vector3 posTarget = Vector3.zero; 
     private Animation _animation = null;
     private Transform _transform = null;
+
     [Header("애니메이션 클립")]
     public AnimationClip IdleAnimationClip = null;
     public AnimationClip MoveAnimaitonClip = null;
@@ -40,30 +42,29 @@ public class SkulMove : MonoBehaviour
     public AnimationClip DamageAnimationClip = null;
     public AnimationClip DieAnimationClip = null;
     [Header("전투속성")]
-    // 체력
-    public int hp = 100;
-    // 가거리
-    public float AtkRange = 1.5f;
-    // 피격 이펙트
-    public GameObject effectDamage = null;
-    // 죽음 이펙트
-    public GameObject effectDie = null;
-    // 이동 반경
-    public float moveRadius = 10f;
-    // 몸통 스킨메시렌더러
+    public int hp = 100; // 체력
+    public float AtkRange = 1.5f; // 공격 사거리
+    public GameObject effectDamage = null; // 피격 시 나올 이펙트
+    public GameObject effectDie = null; // 죽었을 시 나올 이펙트
+    public float moveRadius = 10f; // 이동 반경
     [SerializeField]
-    private SkinnedMeshRenderer skinnedMeshRenderer = null;
+    private SkinnedMeshRenderer skinnedMeshRenderer = null; // 몸통 스킨 메시
 
-    // 공격 어택
     [SerializeField]
-    private BoxCollider _atkCollider = null;
-    // 공격반경
+    private BoxCollider _atkCollider = null; // 공격 콜라이더
     [SerializeField]
-    private float attackDistance = 0.3f;
+    private Collider _col = null; // 스컬의 콜라이더
+    [SerializeField]
+    private float attackDistance = 0.3f; // 실제적 공격 거리
 
-    private Rigidbody _rigid = null; // 캐싱 준비
+    private Action<int> OnDieEvent = null; // 죽었을 때 발행할 이벤트
 
-    private bool _isAttack = false;
+    private Rigidbody _rigid = null; // 리지드바디 캐싱 준비
+
+    private bool _isAttack = false; // 현재 공격중인가?
+
+    [SerializeField]
+    private GameObject _light = null;
 
     #region 애니메이션 이벤트
     private void OnAtkAnimationFinished()
@@ -104,6 +105,7 @@ public class SkulMove : MonoBehaviour
         _transform = GetComponent<Transform>();
         _animation = GetComponent<Animation>();
         _rigid = GetComponent<Rigidbody>();
+        _col = GetComponent<Collider>();
 
         // 애니메이션 초기화
         _animation[IdleAnimationClip.name].wrapMode = WrapMode.Loop;
@@ -120,7 +122,20 @@ public class SkulMove : MonoBehaviour
         OnAnimationEvent(DamageAnimationClip, "OnDamageAnimationFinished");
         OnAnimationEvent(DieAnimationClip, "OnDieAnimationFinished");
 
-        spdMove = Random.Range(spdMove - 1f, spdMove + 1f);
+        spdMove = Random.Range(spdMove - 1f, spdMove + 1f); // 스피드를 랜덤으로
+
+        OnDieEvent += player.GetComponent<LevelUp>().ExpUp; // 죽었을 때 발행할 이벤트에 경험치 추가 함수 넣기
+
+        _light = transform.Find("Point Light").gameObject;
+
+        nightChanger.OnNight += NightReset;
+        nightChanger.OnDay += DayReset;
+
+        if (nightChanger.IsNight)
+            nightChanger.OnNight?.Invoke();
+        else
+            nightChanger.OnDay?.Invoke();
+
     }
     private void Update()
     {
@@ -178,6 +193,10 @@ public class SkulMove : MonoBehaviour
         yield return new WaitForSeconds(timeWait);
         _state = States.IDLE;
     }
+
+    /// <summary>
+    /// 공격 셋팅
+    /// </summary>
     void SetAttack()
     {
         Vector3 temp = targetTransform.position - transform.position;
@@ -207,6 +226,7 @@ public class SkulMove : MonoBehaviour
 
         _state = States.GOTARGET;
     }
+
     /// <summary>
     /// 상태가 무브일 때 동작
     /// </summary>
@@ -267,6 +287,7 @@ public class SkulMove : MonoBehaviour
 
         _transform.LookAt(posLookAt);
     }
+
     /// <summary>
     /// 상태가 대기일 때 동작
     /// </summary>
@@ -331,8 +352,10 @@ public class SkulMove : MonoBehaviour
         }
     }
 
-    //피격 함수
-
+    /// <summary>
+    /// 피격 함수
+    /// </summary>
+    /// <param name="damage"></param>
     public void Damage(int damage)
     {
         hp -= damage;
@@ -353,15 +376,26 @@ public class SkulMove : MonoBehaviour
             if (_state == States.DIE)
                 return;
             _state = States.DIE;
+
+            _col.enabled = false; // 스컬 콜라이더 없애기
+            _atkCollider.enabled = false; // 공격 콜라이더 없애기
+
+            OnDieEvent?.Invoke(1); // 경험치 증가시키기
             Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
 
-            GameObject obj = Instantiate(damageObj, transform.position + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
+            GameObject obj = Instantiate(damageObj, transform.position + new Vector3(0f, 0.5f, 0f), Quaternion.Euler(new Vector3(90f, 0f, 0f))); // 죽었을 때 나올 오브젝트 생성
             obj.transform.SetParent(null);
-            obj.SetActive(true);
+            obj.SetActive(true); 
             obj.transform.DOMoveY(transform.position.y + 1f, 1f);
+
+            nightChanger.OnNight -= NightReset;
+            nightChanger.OnDay -= DayReset;
         }
     }
-
+    
+    /// <summary>
+    /// 리지드바디 속도 초기화 함수
+    /// </summary>
     public void ResetVelocity() => _rigid.velocity = Vector3.zero;
 
     /// <summary>
@@ -370,10 +404,6 @@ public class SkulMove : MonoBehaviour
     private void EffectDamageTween()
     {
         StartCoroutine(Damaged()); // 색깔을 바꾸는 함수
-
-
-        // 데미지 오브젝트 가져와서 올려준 후 다 올라갔으면 false
-        //damageObj.transform.DOMoveY(transform.position.y + 1f, 1f).OnComplete(() => damageObj.SetActive(false)); 
     }
 
     /// <summary>
@@ -389,5 +419,14 @@ public class SkulMove : MonoBehaviour
             skinnedMeshRenderer.material.color = Color.white;
             yield return new WaitForSeconds(0.1f);
         }
+    }
+
+    public void NightReset()
+    {
+        _light.SetActive(true);
+    }
+    public void DayReset()
+    {
+        _light.SetActive(false);
     }
 }

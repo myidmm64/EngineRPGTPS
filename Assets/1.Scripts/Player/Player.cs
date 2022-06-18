@@ -12,32 +12,32 @@ public class Player : MonoBehaviour, IMoveAble
     [SerializeField]
     private float _speed = 5f; // 캐릭터의 이동속도
     [SerializeField]
-    private float _runSpeed = 10f;
+    private float _runSpeed = 10f; // 캐릭터 달리기 이동속도
     [SerializeField]
     private Vector3 _gravityScale = new Vector3(0f, 9.8f, 0f); // 공중에 떠있을 때 중력값
     [SerializeField]
     private float _bodyRotateSpeed = 10f; // 몸 돌리는 속도
     [SerializeField]
-    private float _headRotateSpeed = 2f;
+    private float _headRotateSpeed = 2f; // 마우스에 따라 몸을 돌리는 속도
     [SerializeField]
     private Vector2 _defaultSensitivity = Vector2.zero;
     [SerializeField]
-    private float _normalSensitivity = 1f;
+    private float _normalSensitivity = 1f; // 평상 시 마우스 감도
     [SerializeField]
-    private float _aimSensiticity = 0.5f;
+    private float _aimSensiticity = 0.5f; // 줌 시 마우스 감도
     [SerializeField]
-    private float _battleDuration = 3f;
+    private float _battleDuration = 3f; // 전투 지속시간
     [SerializeField]
-    private float _zoomDuration = 3f;
+    private float _zoomDuration = 3f; // 줌 지속시간
     [SerializeField]
     private Image _crossHair = null; // 크로스헤어
-    private Vector3 amount = Vector3.zero; // 이동에 대한 벡터값
-    private float horizontal = 0f; // Input.GetAxisRaw("Horizontal")
-    private float vertical = 0f; // Input.GetAxisRaw("Vertical")
+    private Vector3 _amount = Vector3.zero; // 이동에 대한 벡터값
+    private float _horizontal = 0f; // Input.GetAxisRaw("Horizontal")
+    private float _vertical = 0f; // Input.GetAxisRaw("Vertical")
     [SerializeField]
-    private BoxCollider _atkCollider = null;
+    private BoxCollider _atkCollider = null; // 플레이어 공격 콜라이더
     [SerializeField]
-    private GameObject _sword = null;
+    private GameObject _sword = null; // 검 오브젝트
 
     private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변수
     private Coroutine IsZoomCo = null; // IsZoomCoroutine을 담아둘 Coroutine 변수
@@ -52,16 +52,16 @@ public class Player : MonoBehaviour, IMoveAble
     private bool _isStop = false; // true면 안움직임
     public bool IsStop { get => _isStop; set => _isStop = value; } // 인터페이스 구현
     private bool _isBattle = false; // true면 전투상태
-    public bool IsBattle { get => _isBattle; set => _isBattle = value; } // _isBattle에 대한 get set 프로퍼티
-    private bool _isZoom = false;
+    public bool IsBattle { get => _isBattle; set => _isBattle = value; }
+    private bool _isZoom = false; // true면 줌 상태
     public bool IsZoom { get => _isZoom; set => _isZoom = value; }
-    private bool _isRun = false;
+    private bool _isRun = false; // true면 달리기 상태
     public bool IsRun { get => _isRun; set => _isRun = value; }
-    private bool _isFreeze = false;
+    private bool _isFreeze = false; // true면 움직이지 못하는 상태
     public bool IsFreeze { get => _isFreeze; set => _isFreeze = value; }
-    private bool _isAttackAble = true;
+    private bool _isAttackAble = true; // true면 왼쪽클릭 가능
     public bool IsAttackAble { get => _isAttackAble; set => _isAttackAble = value; }
-    private bool _isZoomAttackAble = true;
+    private bool _isZoomAttackAble = true; // true면 총알 쏘기 가능
     public bool IsZoomAttackAble { get => _isZoomAttackAble; set => _isZoomAttackAble = value; }
 
     [SerializeField]
@@ -71,14 +71,15 @@ public class Player : MonoBehaviour, IMoveAble
 
     private CharacterController _characterController = null; // 캐릭터 컨트롤러 캐싱 준비
     private CollisionFlags _collisionFlags = CollisionFlags.None; // CollisionFlags 초기화
-    private Transform cam = null; // Camera.main.Transform 캐싱 준비
+    private Transform _cam = null; // Camera.main.Transform 캐싱 준비
     private Animator _animator = null; // 애니메이터 캐싱 준비
 
     [SerializeField]
     private PlayerState _playerState = PlayerState.None; // 플레이어 상태
 
-    public int Coin = 0; // 현재 가지고있는 코인
+    public int Coin = 0; // 현재 가지고있는 코인 (private로 바꿔주세요)
 
+    //플레이어의 상태
     public enum PlayerState
     {
         None = -1,
@@ -95,10 +96,10 @@ public class Player : MonoBehaviour, IMoveAble
         // 캐싱
         _animator = GetComponent<Animator>();
         _characterController = GetComponent<CharacterController>();
-        cam = MainCam.transform;
+        _cam = MainCam.transform;
 
         //나중에 Core로 옮기셈
-        Cursor.visible = false;
+        Cursor.visible = false; // 마우스 포인터 비활성화
 
     }
 
@@ -108,8 +109,6 @@ public class Player : MonoBehaviour, IMoveAble
         _defaultSensitivity = new Vector2(_cinemacine.m_XAxis.m_MaxSpeed, _cinemacine.m_YAxis.m_MaxSpeed);
         OnIdle?.Invoke();
         ExitZoom();
-
-        Debug.Log(_defaultSensitivity);
     }
 
     private void Update()
@@ -131,7 +130,7 @@ public class Player : MonoBehaviour, IMoveAble
             case PlayerState.None:
                 break;
             case PlayerState.Idle:
-                BodyRotate(amount);
+                BodyRotate(_amount);
                 break;
             case PlayerState.Battle:
                 HeadRotate();
@@ -140,7 +139,7 @@ public class Player : MonoBehaviour, IMoveAble
                 HeadRotate();
                 break;
             case PlayerState.Run:
-                BodyRotate(amount);
+                BodyRotate(_amount);
                 break;
             case PlayerState.Dash:
                 break;
@@ -157,7 +156,8 @@ public class Player : MonoBehaviour, IMoveAble
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
         gUI.fontStyle = FontStyle.Bold;
-        GUI.Label(new Rect(10, 60, 100, 200), $"Coin : {Coin}", gUI);
+        gUI.normal.textColor = Color.red;
+        GUI.Label(new Rect(10, 100, 100, 200), $"Coin : {Coin}", gUI);
 
 
         //if (GUI.Button(new Rect(10,100,600,80), $"캐릭터에 대해 무언가 하는 버튼", gUI))
@@ -174,11 +174,11 @@ public class Player : MonoBehaviour, IMoveAble
         if (IsFreeze || IsStop)
             return;
 
-        horizontal = Input.GetAxisRaw("Horizontal");
-        vertical = Input.GetAxisRaw("Vertical");
+        _horizontal = Input.GetAxisRaw("Horizontal");
+        _vertical = Input.GetAxisRaw("Vertical");
 
         // isStop이거나 키가 눌리지 않았으면 return
-        if((horizontal == 0f && vertical == 0f) || _isStop == true)
+        if((_horizontal == 0f && _vertical == 0f) || _isStop == true)
         {
             _animator.SetBool("IsMove", false);
             return;
@@ -188,19 +188,22 @@ public class Player : MonoBehaviour, IMoveAble
         SetMoveAnimation();
 
         //이동 구현부
-        Vector3 forward = cam.TransformDirection(Vector3.forward);
+        Vector3 forward = _cam.TransformDirection(Vector3.forward);
         forward.y = 0f;
         Vector3 right = new Vector3(forward.z , 0f , -forward.x);
-        amount = (forward * vertical + right * horizontal) * Time.deltaTime;
-        amount *= IsRun ? _runSpeed : _speed;
+        _amount = (forward * _vertical + right * _horizontal) * Time.deltaTime;
+        _amount *= IsRun ? _runSpeed : _speed;
 
         if (_collisionFlags == CollisionFlags.None)
-            amount -= _gravityScale * Time.deltaTime;
+            _amount -= _gravityScale * Time.deltaTime;
 
-        _collisionFlags = _characterController.Move(amount);
+        _collisionFlags = _characterController.Move(_amount);
 
     }
 
+    /// <summary>
+    /// 애니메이터에 Setfloat로 넣을 값 설정
+    /// </summary>
     private void SetMoveAnimation()
     {
         float ver = Input.GetAxis("Vertical");
@@ -226,8 +229,9 @@ public class Player : MonoBehaviour, IMoveAble
     }
 
     /// <summary>
-    /// Battle 상태일 때 몸 돌리는 함수
+    /// 전투 상태일 때 몸 돌리는 함수
     /// </summary>
+    /// <param name="즉시 회전"></param>
     private void HeadRotate(bool immediately = false)
     {
 
@@ -241,6 +245,9 @@ public class Player : MonoBehaviour, IMoveAble
             transform.rotation = Quaternion.Lerp(transform.rotation, rot, _headRotateSpeed * Time.deltaTime);
     }
 
+    /// <summary>
+    /// 어택 애니메이션 시작헀을 때 실행될 것
+    /// </summary>
     public void SwordAttackStart()
     {
         //attackAble
@@ -249,6 +256,9 @@ public class Player : MonoBehaviour, IMoveAble
         IsAttackAble = false;
     }
 
+    /// <summary>
+    /// 어택 애니메이션 끝냈을 때 실행될 것
+    /// </summary>
     public void SwordAttackEnd()
     {
         _atkCollider.enabled = false;
@@ -353,10 +363,11 @@ public class Player : MonoBehaviour, IMoveAble
         // 감도 줌 감도로 바꾸기
         _zoom.enabled = true;
         _zoom.m_Width = 5f;
-        _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _aimSensiticity;
+        
+        // 감도 줌 감도로 바꾸기
+        _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _aimSensiticity; 
         _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _aimSensiticity;
 
-        // LookAt이랑 Follow 오른쪽 어깨로 바꿔주기
     }
 
     /// <summary>
@@ -380,13 +391,15 @@ public class Player : MonoBehaviour, IMoveAble
 
         _zoom.enabled = false;
 
+        //감도 원래대로 돌려놓기
         _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _normalSensitivity;
         _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _normalSensitivity;
-        // LookAt이랑 Follow 다시 원래대로 바꿔주기
     }
 
 
-    //임시 코드
+    /// <summary>
+    /// 임시코드 : 공격 애니메이션 실행
+    /// </summary>
     public void Ani()
     {
         _animator.SetTrigger("Shoot");
@@ -438,6 +451,10 @@ public class Player : MonoBehaviour, IMoveAble
         ExitZoom();
     }
 
+    /// <summary>
+    /// 플레이어 상태 변환
+    /// </summary>
+    /// <param name="state"></param>
     public void SetState(PlayerState state)
     {
         _playerState = state;

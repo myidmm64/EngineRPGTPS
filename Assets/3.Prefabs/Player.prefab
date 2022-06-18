@@ -630,7 +630,8 @@ GameObject:
   - component: {fileID: 2343020177473640427}
   - component: {fileID: 2343020177473640424}
   - component: {fileID: 302308355}
-  m_Layer: 6
+  - component: {fileID: 302308356}
+  m_Layer: 14
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -820,6 +821,18 @@ MonoBehaviour:
   OnZoomShoot:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 2343020177829663080}
+        m_TargetAssemblyTypeName: PlayerZoomShoot, Assembly-CSharp
+        m_MethodName: ZoomShootDelay
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 2343020177829663127}
         m_TargetAssemblyTypeName: PlayerMove, Assembly-CSharp
         m_MethodName: OnZoomShootReset
@@ -909,10 +922,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc5e0bc91b0d9714d914af1c995e9f83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bullet: {fileID: 1195278084437848, guid: de89f99ec88a1a84bb80132bbc06100f, type: 3}
+  _bullet: {fileID: 5735801584301908043, guid: 7e2909a5307d5db4e884d49886bc945d, type: 3}
   _shootBulletPosition: {fileID: 1423462475}
   _virtualCamera: {fileID: 0}
-  _aimRange: 100
+  _aimRange: 5000
+  _zoomAttackDelay: 0.5
   _aimColliderLayerMask:
     serializedVersion: 2
     m_Bits: 1
@@ -1014,7 +1028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fff5caaf42caa0f48a8243acaac09203, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mp: 10
+  _mp: 50
 --- !u!114 &302308355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1027,6 +1041,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9f2be939896ab34aa19d71082115363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &302308356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2343020177829762589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 603e3bff5b4366a41ae2498d30090d3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentExp: 0
+  _targetExp: 5
+  _currentlevel: 1
+  OnLevelUp:
+    m_PersistentCalls:
+      m_Calls: []
+  OnExpUp:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2343020177829762591
 GameObject:
   m_ObjectHideFlags: 0

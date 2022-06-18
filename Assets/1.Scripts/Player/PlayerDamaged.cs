@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerDamaged : MonoBehaviour
 {
     [SerializeField]
-    private int _hp = 10;
+    private int _hp = 10; // 플레이어의 Hp
     public int HP { get => _hp; set => _hp = value; }
     [SerializeField]
     private float _damageDelay = 1f; // 맞는 딜레이
 
     private bool _isDamage = false; // 현재 맞고있는가
-    private Animator _animator = null;
+    private Animator _animator = null; // 애니메이터 캐싱준비
 
     private void Awake()
     {
@@ -23,12 +24,13 @@ public class PlayerDamaged : MonoBehaviour
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
         gUI.fontStyle = FontStyle.Bold;
-        GUI.Label(new Rect(10, 10, 100, 200), $"HP : {_hp}", gUI);
+        gUI.normal.textColor = Color.red;
+        GUI.Label(new Rect(10, 60, 100, 200), $"HP : {_hp}", gUI);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("EnemyAtk"))
+        if (other.CompareTag("EnemyAtk")) // 만약 적의 공격에 맞았는가
         {
             if (_isDamage == false)
             {
@@ -36,6 +38,7 @@ public class PlayerDamaged : MonoBehaviour
                 if(_hp <= 0)
                 {
                     _animator.SetTrigger("Death");
+                    Invoke("Restart", 2f); // 재시작
                     return;
                 }
 
@@ -44,6 +47,18 @@ public class PlayerDamaged : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 게임 재시작 함수
+    /// </summary>
+    public void Restart()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
+
+    /// <summary>
+    /// 피격 상태 코루틴
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator DamageCoroutine()
     {
         _isDamage = true;
