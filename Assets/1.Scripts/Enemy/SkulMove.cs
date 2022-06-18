@@ -170,6 +170,7 @@ public class SkulMove : MonoBehaviour
     IEnumerator SetWait()
     {
         //해골 상태를 대기상태로 변경
+        Debug.Log("대기");
         _state = States.WAIT;
         //대기하는 시간
         float timeWait = Random.Range(1f, 3f);

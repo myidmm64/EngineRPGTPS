@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class MPPosion : Item
@@ -7,12 +8,15 @@ public class MPPosion : Item
     [SerializeField]
     private PlayerUseSkill _playerUseSkill = null;
     [SerializeField]
+    private TextMeshProUGUI _Pricetext = null;
+    [SerializeField]
     private int _mpUp = 1;
 
     private void Start()
     {
-        Count = 100;
+        Count = 0;
         Price = 1;
+        _Pricetext.SetText($"가격 : {Price}");
     }
 
     public override void UseItem()
@@ -30,6 +34,8 @@ public class MPPosion : Item
         {
             Count++;
             _player.Coin -= Price;
+            Price += 1;
+            _Pricetext.SetText($"가격 : {Price}");
         }
     }
 }

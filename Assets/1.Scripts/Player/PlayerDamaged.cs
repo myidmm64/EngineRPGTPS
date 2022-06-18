@@ -35,7 +35,7 @@ public class PlayerDamaged : MonoBehaviour
                 _hp -= 1;
                 if(_hp <= 0)
                 {
-
+                    _animator.SetTrigger("Death");
                     return;
                 }
 

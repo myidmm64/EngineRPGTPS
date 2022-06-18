@@ -15,15 +15,15 @@ TagManager:
   - 
   - Water
   - UI
-  - Agent
+  - Enemy
   - Detecter
   - Sculpture
   - Effect
   - Object
   - GodMode
-  - Attack
-  - 
-  - 
+  - PlayerAttack
+  - EnemyAttack
+  - Player
   - 
   - 
   - 

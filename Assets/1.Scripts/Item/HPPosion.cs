@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class HPPosion : Item
@@ -7,13 +8,16 @@ public class HPPosion : Item
     [SerializeField]
     private PlayerDamaged _playerDamage = null;
     [SerializeField]
+    private TextMeshProUGUI _Pricetext = null;
+    [SerializeField]
     private int _hpUp = 1;
     
 
     private void Start()
     {
-        Count = 100;
+        Count = 0;
         Price = 1;
+        _Pricetext.SetText($"가격 : {Price}");
     }
 
     public override void UseItem()
@@ -31,6 +35,8 @@ public class HPPosion : Item
         {
             Count++;
             _player.Coin -= Price;
+            Price+= 1;
+            _Pricetext.SetText($"가격 : {Price}");
         }
     }
 }

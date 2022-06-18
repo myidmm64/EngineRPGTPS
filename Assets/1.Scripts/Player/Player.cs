@@ -61,6 +61,8 @@ public class Player : MonoBehaviour, IMoveAble
     public bool IsFreeze { get => _isFreeze; set => _isFreeze = value; }
     private bool _isAttackAble = true;
     public bool IsAttackAble { get => _isAttackAble; set => _isAttackAble = value; }
+    private bool _isZoomAttackAble = true;
+    public bool IsZoomAttackAble { get => _isZoomAttackAble; set => _isZoomAttackAble = value; }
 
     [SerializeField]
     private CinemachineFreeLook _cinemacine = null; // 감도 관련해서 갖고오기 위함

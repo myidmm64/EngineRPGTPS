@@ -19,9 +19,13 @@ public class PlayerZoomShoot : MonoBehaviour
     [SerializeField]
     private float _aimRange = 100f; // 에임을 할 수 있는 사정거리
     [SerializeField]
+    private float _zoomAttackDelay = 1f;
+    [SerializeField]
     private LayerMask _aimColliderLayerMask = new LayerMask(); // 에임이 딱 갈 수 있는 레이어
     [SerializeField]
     private Transform _debugTrasnform = null; // 에임위치 디버그용
+
+    private bool _isZoomAttacking = false;
 
     private Player _player = null; // 플레이어
 
@@ -45,8 +49,31 @@ public class PlayerZoomShoot : MonoBehaviour
         // 카메라 바꾸기
     }
 
+    public void ZoomShootDelay()
+    {
+        if (_isZoomAttacking)
+            return;
+
+        StartCoroutine(ZoomShootDelayCoroutine());
+    }
+
+    private IEnumerator ZoomShootDelayCoroutine()
+    {
+        _player.IsZoomAttackAble = false;
+        Debug.Log("줌 불가");
+        _isZoomAttacking = true;
+        yield return new WaitForSeconds(_zoomAttackDelay);
+        _player.IsZoomAttackAble = true;
+        _isZoomAttacking = false;
+        Debug.Log("줌 ㄱㄴ");
+    }
+
+
     private void Update()
     {
+        if (_player.IsZoom == false)
+            return;
+
         _mouseWorldPosition = Vector3.zero;
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         Ray ray = MainCam.ScreenPointToRay(screenCenterPoint);
@@ -58,18 +85,9 @@ public class PlayerZoomShoot : MonoBehaviour
             _mouseWorldPosition = raycastHit.point;
         }
 
-        if (_player.IsZoom)
-        {
-
-            Vector3 worldAimTartget = _mouseWorldPosition;
-            worldAimTartget.y = transform.position.y;
-            Vector3 aimDirection = (worldAimTartget - transform.position).normalized;
-
-        }
-        else
-        {
-
-        }
+        Vector3 worldAimTartget = _mouseWorldPosition;
+        worldAimTartget.y = transform.position.y;
+        Vector3 aimDirection = (worldAimTartget - transform.position).normalized;
     }
 
     public void ShootBullet()

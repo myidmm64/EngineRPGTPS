@@ -93,7 +93,7 @@ public class PlayerInputs : MonoBehaviour
                 _playerMove.IsAttackAble = false;
                 _playerMove.OnBattle?.Invoke();
             }
-            else if (_playerMove.IsZoom == true) // 만약 줌을 하고있었다면 줌샷 
+            else if (_playerMove.IsZoom == true && _playerMove.IsZoomAttackAble) // 만약 줌을 하고있었다면 줌샷 
                 _playerMove.OnZoomShoot?.Invoke();
         }
         //오른쪽 클릭 시 줌 이벤트

@@ -1,5 +1,72 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1880655202
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1880655203}
+  - component: {fileID: 1880655204}
+  - component: {fileID: 1880655205}
+  m_Layer: 7
+  m_Name: Detecter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1880655203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1880655202}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1141202791085602248}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &1880655204
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1880655202}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1880655205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1880655202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51023e56e3b4a0144974d0f29fc00b02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsters:
+  - {fileID: 232099852938550395, guid: 4c567ecb98210004f89a0132b2817358, type: 3}
+  spawnPoints:
+  - {fileID: 1142105930745558793}
+  - {fileID: 1142105929839180196}
+  - {fileID: 1142105929567049052}
+  - {fileID: 1142105930420160908}
+  - {fileID: 1142105929865489923}
+  - {fileID: 1142105929856351918}
 --- !u!1 &1142105929567049053
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,8 +301,7 @@ GameObject:
   - component: {fileID: 1141202791085602248}
   - component: {fileID: 1126436145041544772}
   - component: {fileID: 1119987603691516670}
-  - component: {fileID: 1142105928754532860}
-  - component: {fileID: 1142105928754532863}
+  - component: {fileID: 4449375107470034}
   m_Layer: 8
   m_Name: SpawnPoint
   m_TagString: Untagged
@@ -256,6 +322,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1142105930360597863}
+  - {fileID: 1880655203}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -309,37 +376,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &1142105928754532860
-SphereCollider:
+--- !u!65 &4449375107470034
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142353645404864932}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 2
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1142105928754532863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1142353645404864932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 51023e56e3b4a0144974d0f29fc00b02, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  monsters:
-  - {fileID: 232099852938550395, guid: 4c567ecb98210004f89a0132b2817358, type: 3}
-  spawnPoints:
-  - {fileID: 1142105930745558793}
-  - {fileID: 1142105929839180196}
-  - {fileID: 1142105929567049052}
-  - {fileID: 1142105930420160908}
-  - {fileID: 1142105929865489923}
-  - {fileID: 1142105929856351918}
+  m_Size: {x: 1.0504997, y: 1.7695185, z: 0.4558072}
+  m_Center: {x: -0.00017952919, y: 0.8868626, z: -0.00076806545}
