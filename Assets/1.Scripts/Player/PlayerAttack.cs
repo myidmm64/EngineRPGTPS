@@ -8,12 +8,14 @@ public class PlayerAttack : MonoBehaviour
     private List<GameObject> _attackEffect = new List<GameObject>();
     [SerializeField]
     private Transform _playerTransform = null;
+    [SerializeField]
+    private int _damage = 10;
 
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("Enemy"))
         {
-            other.GetComponent<SkulMove>()?.Damage();
+            other.GetComponent<SkulMove>()?.Damage(damage : _damage);
         }
     }
 

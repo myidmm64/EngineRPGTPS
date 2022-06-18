@@ -18,6 +18,14 @@ public class Player : MonoBehaviour, IMoveAble
     [SerializeField]
     private float _bodyRotateSpeed = 10f; // 몸 돌리는 속도
     [SerializeField]
+    private float _headRotateSpeed = 2f;
+    [SerializeField]
+    private Vector2 _defaultSensitivity = Vector2.zero;
+    [SerializeField]
+    private float _normalSensitivity = 1f;
+    [SerializeField]
+    private float _aimSensiticity = 0.5f;
+    [SerializeField]
     private float _battleDuration = 3f;
     [SerializeField]
     private float _zoomDuration = 3f;
@@ -37,6 +45,7 @@ public class Player : MonoBehaviour, IMoveAble
     public UnityEvent OnBattle = null; // Battle 상태일 때 실행될 이벤트
     public UnityEvent OnIdle = null; // Battle 상태가 아닐 때 실행될 이벤트
     public UnityEvent OnZoom = null; // 우클릭을 눌렀을 때 실행될 이벤트
+    public UnityEvent OnZoomOut = null; // 
     public UnityEvent OnZoomShoot = null; // 우클릭을 누르고 좌클릭을 눌렀을 때 실행될 이벤트
     public UnityEvent OnDash = null; // 대시 키를 눌렀을 때 실행될 이벤트
 
@@ -94,8 +103,11 @@ public class Player : MonoBehaviour, IMoveAble
     private void Start()
     {
         // 초기화
+        _defaultSensitivity = new Vector2(_cinemacine.m_XAxis.m_MaxSpeed, _cinemacine.m_YAxis.m_MaxSpeed);
         OnIdle?.Invoke();
         ExitZoom();
+
+        Debug.Log(_defaultSensitivity);
     }
 
     private void Update()
@@ -214,14 +226,17 @@ public class Player : MonoBehaviour, IMoveAble
     /// <summary>
     /// Battle 상태일 때 몸 돌리는 함수
     /// </summary>
-    private void HeadRotate()
+    private void HeadRotate(bool immediately = false)
     {
 
         Quaternion rot = Quaternion.identity;
         //rot = Quaternion.Euler(new Vector3(0f, 60f, 0f));
         rot *= Quaternion.Euler(new Vector3(0f, _cinemacine.m_XAxis.Value, 0f));
 
-        transform.rotation = rot;
+        if (immediately)
+            transform.rotation = rot;
+        else
+            transform.rotation = Quaternion.Lerp(transform.rotation, rot, _headRotateSpeed * Time.deltaTime);
     }
 
     public void SwordAttackStart()
@@ -250,7 +265,7 @@ public class Player : MonoBehaviour, IMoveAble
         CrossHairEnable(false);
 
 
-        HeadRotate();
+        HeadRotate(true);
 
         if (IsZoomCo != null)
             StopCoroutine(IsZoomCo);
@@ -336,6 +351,8 @@ public class Player : MonoBehaviour, IMoveAble
         // 감도 줌 감도로 바꾸기
         _zoom.enabled = true;
         _zoom.m_Width = 5f;
+        _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _aimSensiticity;
+        _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _aimSensiticity;
 
         // LookAt이랑 Follow 오른쪽 어깨로 바꿔주기
     }
@@ -361,6 +378,8 @@ public class Player : MonoBehaviour, IMoveAble
 
         _zoom.enabled = false;
 
+        _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _normalSensitivity;
+        _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _normalSensitivity;
         // LookAt이랑 Follow 다시 원래대로 바꿔주기
     }
 

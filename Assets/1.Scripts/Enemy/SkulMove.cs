@@ -332,9 +332,10 @@ public class SkulMove : MonoBehaviour
 
     //피격 함수
 
-    public void Damage()
+    public void Damage(int damage)
     {
-        hp -= 10;
+        hp -= damage;
+
         if (hp > 0)
         {
             Instantiate(effectDie, transform.position + new Vector3(0f, 0.5f, 0f), transform.rotation); // 피격 이펙트 생성

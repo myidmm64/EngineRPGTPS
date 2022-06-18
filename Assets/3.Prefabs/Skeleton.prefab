@@ -646,9 +646,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 232099852938706985}
-  m_Layer: 0
+  - component: {fileID: 1291842451}
+  m_Layer: 12
   m_Name: Bip001 R Hand
-  m_TagString: Untagged
+  m_TagString: EnemyAtk
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -670,6 +671,19 @@ Transform:
   m_Father: {fileID: 232099852938706991}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1291842451
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232099852938550345}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.05150999, y: 0.039662078, z: 0.13798532}
+  m_Center: {x: -0.013756711, y: 0.0083146645, z: 0.057301514}
 --- !u!1 &232099852938550347
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,12 +1398,12 @@ MonoBehaviour:
   DamageAnimationClip: {fileID: 7400000, guid: 45dd499fe591aaa4db035cea612549e4, type: 3}
   DieAnimationClip: {fileID: 7400000, guid: 6d8331bc65fd9bb47876ce34d1b4b8a8, type: 3}
   hp: 100
-  AtkRange: 1.5
+  AtkRange: 1.2
   effectDamage: {fileID: 139366, guid: b185c1a9cf067374586d095111b15bd1, type: 3}
   effectDie: {fileID: 139366, guid: b185c1a9cf067374586d095111b15bd1, type: 3}
   moveRadius: 10
   skinnedMeshRenderer: {fileID: 232099852924883255}
-  _atkCollider: {fileID: 1836272887}
+  _atkCollider: {fileID: 1291842451}
   attackDistance: 0.3
 --- !u!1 &232099852938550397
 GameObject:
@@ -1432,7 +1446,6 @@ GameObject:
   m_Component:
   - component: {fileID: 232099852938707039}
   - component: {fileID: 232099852924883253}
-  - component: {fileID: 1836272887}
   m_Layer: 0
   m_Name: Object01
   m_TagString: EnemyAtk
@@ -1509,19 +1522,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.0014118575, y: 0.000021925196, z: 0.040557608}
     m_Extent: {x: 0.0124346055, y: 0.006705289, z: 0.05640191}
   m_DirtyAABB: 0
---- !u!65 &1836272887
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 232099852938550399}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 0.028813373, y: 0.14749324, z: 0.028402884}
-  m_Center: {x: -0.007701332, y: -0.055794567, z: 0.0025102154}
 --- !u!1 &232099852953408962
 GameObject:
   m_ObjectHideFlags: 0
@@ -1533,7 +1533,7 @@ GameObject:
   - component: {fileID: 232099852953408963}
   - component: {fileID: 232099852953408989}
   - component: {fileID: 232099852953408988}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Detector
   m_TagString: Untagged
   m_Icon: {fileID: 0}

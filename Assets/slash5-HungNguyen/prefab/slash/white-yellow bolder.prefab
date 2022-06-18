@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1010469353794949302}
   - component: {fileID: 1010469353794949301}
   - component: {fileID: 1010469353794949300}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: slash-white-yellow-bolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 3662496979572467538}
   - component: {fileID: -2527824702190352911}
   - component: {fileID: -7578921662466301106}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: white-yellow bolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

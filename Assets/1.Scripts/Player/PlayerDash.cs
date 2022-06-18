@@ -63,16 +63,18 @@ public class PlayerDash : MonoBehaviour
 
     private IEnumerator DashAnimation()
     {
+        int layer = _player.gameObject.layer;
         //무적판정 추가
         _player.IsStop = true;
         _player.IsFreeze = true;
         _player.SetState(Player.PlayerState.Dash);
-        _capsuleCollider.enabled = false; // 이부분 바꾸기
         _animator.SetTrigger("IsDash");
+        _player.gameObject.layer = 11;
+
         yield return new WaitForSeconds(0.5f);
         _player.IsStop = false;
         _player.IsFreeze = false;
-        _capsuleCollider.enabled = true;
+        _player.gameObject.layer = layer;
 
         if (_player.IsBattle)
             _player.SetState(Player.PlayerState.Battle);

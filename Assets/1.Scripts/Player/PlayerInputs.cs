@@ -110,6 +110,7 @@ public class PlayerInputs : MonoBehaviour
 
             _playerMove.ExitZoom();
             _playerMove.CrossHairEnable(false);
+            _playerMove.OnZoomOut?.Invoke();
         }
     }
 
