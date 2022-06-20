@@ -106,6 +106,11 @@ public class Player : MonoBehaviour, IMoveAble
     private void Start()
     {
         // √ ±‚»≠
+        Init();
+    }
+
+    public void Init()
+    {
         _defaultSensitivity = new Vector2(_cinemacine.m_XAxis.m_MaxSpeed, _cinemacine.m_YAxis.m_MaxSpeed);
         OnIdle?.Invoke();
         ExitZoom();

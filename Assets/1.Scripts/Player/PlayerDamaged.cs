@@ -14,8 +14,11 @@ public class PlayerDamaged : MonoBehaviour
     private bool _isDamage = false; // 현재 맞고있는가
     private Animator _animator = null; // 애니메이터 캐싱준비
 
+    private Player _player = null;
+
     private void Awake()
     {
+        _player = GetComponent<Player>();
         _animator = GetComponent<Animator>();
     }
 
@@ -52,6 +55,7 @@ public class PlayerDamaged : MonoBehaviour
     /// </summary>
     public void Restart()
     {
+        _player.Init();
         SceneManager.LoadScene("SampleScene");
     }
 

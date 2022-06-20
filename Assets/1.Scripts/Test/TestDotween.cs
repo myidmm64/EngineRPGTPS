@@ -2,17 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class TestDotween : MonoBehaviour
 {
 
+    [SerializeField]
+    private GameObject monster = null;
+    private List<int> prices = new List<int>();
+    //private CinemachineVirtualCamera virtualCamera = null;
+    private static TestDotween _instance;
+    public static TestDotween Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = new GameObject("Manager").AddComponent<TestDotween>();
+            return _instance;
+        }
+    }
+
     private void Start()
     {
-
-        transform.DOMoveX(2f, 3f).OnComplete(DDDD);
-    }
-    private void DDDD()
-    {
-        Debug.Log("asds");
+        //prices[0] = 100;
     }
 }
