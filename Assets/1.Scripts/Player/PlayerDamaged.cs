@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,10 +38,12 @@ public class PlayerDamaged : MonoBehaviour
         {
             if (_isDamage == false)
             {
-                _hp -= 1;
+                _hp -= other.GetComponent<SkulAttack>().Damage;
+
                 if(_hp <= 0)
                 {
                     _animator.SetTrigger("Death");
+
                     Invoke("Restart", 2f); // Àç½ÃÀÛ
                     return;
                 }

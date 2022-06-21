@@ -41,6 +41,9 @@ public class Player : MonoBehaviour, IMoveAble
 
     private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변수
     private Coroutine IsZoomCo = null; // IsZoomCoroutine을 담아둘 Coroutine 변수
+    private Coroutine IsAttackCo = null; // 을 담아둘 Coroutine 변수
+
+    private int _attackCnt = 0;
 
     public UnityEvent OnBattle = null; // Battle 상태일 때 실행될 이벤트
     public UnityEvent OnIdle = null; // Battle 상태가 아닐 때 실행될 이벤트
@@ -77,7 +80,22 @@ public class Player : MonoBehaviour, IMoveAble
     [SerializeField]
     private PlayerState _playerState = PlayerState.None; // 플레이어 상태
 
-    public int Coin = 0; // 현재 가지고있는 코인 (private로 바꿔주세요)
+    private int _coin = 0;
+    public int Coin { get => _coin; set => _coin = value; } // 현재 가지고있는 코인 (private로 바꿔주세요)
+
+    private int _monsterCnt = 0; //
+    public int MonsterCnt
+    {
+        get => _monsterCnt;
+        set
+        {
+            _monsterCnt = value;
+            if(_monsterCnt >= 10)
+            {
+                Debug.Log("ㅁㄴㅇㅁ");
+            }
+        }
+    }
 
     //플레이어의 상태
     public enum PlayerState
@@ -99,7 +117,7 @@ public class Player : MonoBehaviour, IMoveAble
         _cam = MainCam.transform;
 
         //나중에 Core로 옮기셈
-        Cursor.visible = false; // 마우스 포인터 비활성화
+        //Cursor.visible = false; // 마우스 포인터 비활성화
 
     }
 
@@ -121,6 +139,7 @@ public class Player : MonoBehaviour, IMoveAble
         Move();
         StateDoSomething();
     }
+
 
     /// <summary>
     /// 스테이트에 따라 실행할 것
@@ -163,6 +182,7 @@ public class Player : MonoBehaviour, IMoveAble
         gUI.fontStyle = FontStyle.Bold;
         gUI.normal.textColor = Color.red;
         GUI.Label(new Rect(10, 100, 100, 200), $"Coin : {Coin}", gUI);
+        GUI.Label(new Rect(10, 260, 100, 200), $"cnt : {MonsterCnt}", gUI);
 
 
         //if (GUI.Button(new Rect(10,100,600,80), $"캐릭터에 대해 무언가 하는 버튼", gUI))
@@ -256,11 +276,35 @@ public class Player : MonoBehaviour, IMoveAble
     public void SwordAttackStart()
     {
         //attackAble
+        if (IsAttackCo != null)
+            StopCoroutine(IsAttackCo);
+
+        IsAttackCo = StartCoroutine(IsAttackCoroutine());
+
+        OnBattle?.Invoke();
+        _sword.SetActive(true);
         _atkCollider.enabled = true;
         IsFreeze = true;
         IsAttackAble = false;
     }
 
+    /// <summary>
+    /// 연속 공격 코루틴 !!
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator IsAttackCoroutine()
+    {
+        _animator.SetInteger("AttackCnt", _attackCnt);
+        _attackCnt++;
+        _attackCnt = Mathf.Clamp(_attackCnt, 0, 2);
+        Debug.Log($"attack Cnt => {_attackCnt}");
+
+        yield return new WaitForSeconds(2f);
+        _attackCnt = 0;
+        _animator.SetInteger("AttackCnt", _attackCnt);
+        Debug.Log($"어택 카운트 초기화");
+    }
+    
     /// <summary>
     /// 어택 애니메이션 끝냈을 때 실행될 것
     /// </summary>
@@ -280,7 +324,6 @@ public class Player : MonoBehaviour, IMoveAble
         _playerState = PlayerState.Battle;
 
         CrossHairEnable(false);
-
 
         HeadRotate(true);
 
@@ -354,6 +397,7 @@ public class Player : MonoBehaviour, IMoveAble
             StopCoroutine(IsZoomCo);
         IsZoomCo = StartCoroutine(IsZoomCoroutine(_zoomDuration));
 
+        _animator.SetTrigger("ZoomShoot");
         _playerState = PlayerState.ZoomShot;
 
         Debug.Log("Shoot !!");
@@ -367,8 +411,10 @@ public class Player : MonoBehaviour, IMoveAble
         _playerState = PlayerState.Zoom;
         // 감도 줌 감도로 바꾸기
         _zoom.enabled = true;
-        _zoom.m_Width = 5f;
-        
+        _zoom.m_Width = 2f;
+
+        _animator.SetBool("Zoom", true);
+
         // 감도 줌 감도로 바꾸기
         _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _aimSensiticity; 
         _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _aimSensiticity;
@@ -394,20 +440,13 @@ public class Player : MonoBehaviour, IMoveAble
             _playerState = PlayerState.Idle;
         }
 
+        _animator.SetBool("Zoom", false);
+
         _zoom.enabled = false;
 
         //감도 원래대로 돌려놓기
         _cinemacine.m_XAxis.m_MaxSpeed = _defaultSensitivity.x * _normalSensitivity;
         _cinemacine.m_YAxis.m_MaxSpeed = _defaultSensitivity.y * _normalSensitivity;
-    }
-
-
-    /// <summary>
-    /// 임시코드 : 공격 애니메이션 실행
-    /// </summary>
-    public void Ani()
-    {
-        _animator.SetTrigger("Shoot");
     }
 
     /// <summary>

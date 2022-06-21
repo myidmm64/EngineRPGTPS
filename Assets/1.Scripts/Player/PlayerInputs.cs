@@ -14,6 +14,8 @@ public class PlayerInputs : MonoBehaviour
     [field: SerializeField]
     private UnityEvent OnTapButton = null; // tab 버튼이 눌렸을 때 발행될 이벤트
 
+    private Animator _animator = null;
+
     [SerializeField]
     private GameObject _option = null; // 옵션창
     [SerializeField]
@@ -26,6 +28,7 @@ public class PlayerInputs : MonoBehaviour
     {
         _playerMove = GetComponent<Player>();
         _playerUseSkill = GetComponent<PlayerUseSkill>();
+        _animator = GetComponent<Animator>();
     }
 
     private void Start()
@@ -55,14 +58,14 @@ public class PlayerInputs : MonoBehaviour
             {
                 _isMarketOpen = false;
                 _market.SetActive(false);
-                Cursor.visible = false;
+                //Cursor.visible = false;
                 Time.timeScale = 1f;
             }
             else // 열기
             {
                 _isMarketOpen = true;
                 _market.SetActive(true);
-                Cursor.visible = true;
+                //Cursor.visible = true;
                 Time.timeScale = 0f;
             }
         }
@@ -102,8 +105,9 @@ public class PlayerInputs : MonoBehaviour
 
             if (_playerMove.IsZoom == false) // 줌을 안했으면 그냥 근접공격
             {
+                _animator.SetTrigger("Shoot");
                 _playerMove.IsAttackAble = false;
-                _playerMove.OnBattle?.Invoke();
+                _playerMove.OnBattleReset();
             }
             else if (_playerMove.IsZoom == true && _playerMove.IsZoomAttackAble) // 만약 줌을 하고있었다면 줌샷 
             {
@@ -116,14 +120,14 @@ public class PlayerInputs : MonoBehaviour
         //오른쪽 클릭 시 줌 이벤트
         else if(Input.GetMouseButtonDown(1))
         {
-            if (_playerMove.IsRun || _playerMove.IsFreeze) return;
+            if (_playerMove.IsRun || _playerMove.IsFreeze || _playerMove.IsAttackAble == false) return;
 
             _playerMove.OnZoom?.Invoke();
         }
         //오른쪽 클릭 해제 시 줌 해제
         if(Input.GetMouseButtonUp(1))
         {
-            if (_playerMove.IsRun || _playerMove.IsFreeze) return;
+            if (_playerMove.IsRun || _playerMove.IsFreeze || _playerMove.IsAttackAble == false) return;
 
             _playerMove.ExitZoom();
             _playerMove.CrossHairEnable(false);

@@ -762,6 +762,7 @@ GameObject:
   m_Component:
   - component: {fileID: 232099852938706985}
   - component: {fileID: 1291842451}
+  - component: {fileID: 1793493201}
   m_Layer: 13
   m_Name: Bip001 R Hand
   m_TagString: EnemyAtk
@@ -799,6 +800,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.05150999, y: 0.039662078, z: 0.13798532}
   m_Center: {x: -0.013756711, y: 0.0083146645, z: 0.057301514}
+--- !u!114 &1793493201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232099852938550345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07184f2a17219064fb6784db1e7643de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damage: 1
 --- !u!1 &232099852938550347
 GameObject:
   m_ObjectHideFlags: 0

@@ -66,6 +66,16 @@ public class SkulMove : MonoBehaviour
     [SerializeField]
     private GameObject _light = null;
 
+    private int _damage = 1;
+    public int damage
+    {
+        get => _damage;
+        set
+        {
+            _damage = value;
+        }
+    }
+
     #region 애니메이션 이벤트
     private void OnAtkAnimationFinished()
     {
@@ -381,6 +391,8 @@ public class SkulMove : MonoBehaviour
             _atkCollider.enabled = false; // 공격 콜라이더 없애기
 
             OnDieEvent?.Invoke(1); // 경험치 증가시키기
+            player.MonsterCnt++;
+
             Destroy(gameObject, DieAnimationClip.length - 0.15f); // DIE 애니메이션 실행 후 디스트로이
 
             GameObject obj = Instantiate(damageObj, transform.position + new Vector3(0f, 0.5f, 0f), Quaternion.Euler(new Vector3(90f, 0f, 0f))); // 죽었을 때 나올 오브젝트 생성
@@ -421,12 +433,17 @@ public class SkulMove : MonoBehaviour
         }
     }
 
+    private int _attackDamage = 1;
+
     public void NightReset()
     {
         _light.SetActive(true);
+        _attackDamage = _atkCollider.GetComponent<SkulAttack>().Damage;
+        _atkCollider.GetComponent<SkulAttack>().Damage = 2;
     }
     public void DayReset()
     {
         _light.SetActive(false);
+        _atkCollider.GetComponent<SkulAttack>().Damage = _attackDamage;
     }
 }
