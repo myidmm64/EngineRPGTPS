@@ -14,6 +14,11 @@ public class NightChanger : MonoBehaviour
     private bool _isNight = false; // ÇöÀç ¹ãÀÎ°¡?
     public bool IsNight => _isNight;
 
+    [SerializeField]
+    private Material _daySkyboxMaterial;
+    [SerializeField]
+    private Material _nightSkyboxMaterial;
+
     public Action OnNight;
     public Action OnDay;
 
@@ -31,7 +36,8 @@ public class NightChanger : MonoBehaviour
             {
                 _isNight = true;
                 OnNight?.Invoke();
-                for(int i =0; i<lights.Count; i++)
+                RenderSettings.skybox = _nightSkyboxMaterial;
+                for (int i =0; i<lights.Count; i++)
                 {
                     lights[i].SetActive(true);
                 }
@@ -42,6 +48,7 @@ public class NightChanger : MonoBehaviour
             {
                 _isNight = false;
                 OnDay?.Invoke();
+                RenderSettings.skybox = _daySkyboxMaterial;
                 for (int i = 0; i < lights.Count; i++)
                 {
                     lights[i].SetActive(false);

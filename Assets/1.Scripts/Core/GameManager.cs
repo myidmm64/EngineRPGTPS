@@ -15,15 +15,6 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void Update()
-    {
-        if(Input.GetMouseButtonDown(2))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
-    }
-
     public void GameExit()
     {
         Application.Quit();

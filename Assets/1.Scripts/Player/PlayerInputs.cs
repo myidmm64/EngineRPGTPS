@@ -58,14 +58,17 @@ public class PlayerInputs : MonoBehaviour
             {
                 _isMarketOpen = false;
                 _market.SetActive(false);
-                //Cursor.visible = false;
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Confined;
                 Time.timeScale = 1f;
             }
             else // 열기
             {
+                OnTapButton?.Invoke();
                 _isMarketOpen = true;
                 _market.SetActive(true);
-                //Cursor.visible = true;
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
                 Time.timeScale = 0f;
             }
         }
@@ -82,12 +85,16 @@ public class PlayerInputs : MonoBehaviour
             {
                 _isOpenUI = false;
                 _option.SetActive(false);
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Confined;
                 Time.timeScale = 1f;
             }
             else // 열기
             {
                 _isOpenUI = true;
                 _option.SetActive(true);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
                 Time.timeScale = 0f;
             }
         }
