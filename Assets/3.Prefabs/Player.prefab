@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1116203526
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1116203527}
+  m_Layer: 14
+  m_Name: LookObj
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1116203527
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116203526}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2343020177829530365}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1423462474
 GameObject:
   m_ObjectHideFlags: 0
@@ -656,6 +687,7 @@ Transform:
   - {fileID: 2343020177677150303}
   - {fileID: 2343020177724864293}
   - {fileID: 1423462475}
+  - {fileID: 1116203527}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -716,7 +748,7 @@ MonoBehaviour:
   _headRotateSpeed: 15
   _defaultSensitivity: {x: 0, y: 0}
   _normalSensitivity: 1
-  _aimSensiticity: 0.5
+  _aimSensiticity: 0.3
   _battleDuration: 10
   _zoomDuration: 10
   _crossHair: {fileID: 0}
@@ -728,18 +760,6 @@ MonoBehaviour:
       - m_Target: {fileID: 2343020177829663127}
         m_TargetAssemblyTypeName: PlayerMove, Assembly-CSharp
         m_MethodName: OnBattleReset
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2343020177829663127}
-        m_TargetAssemblyTypeName: PlayerMove, Assembly-CSharp
-        m_MethodName: Ani
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -875,7 +895,6 @@ MonoBehaviour:
   _cinemacine: {fileID: 0}
   _zoom: {fileID: 0}
   _playerState: -1
-  Coin: 0
 --- !u!114 &2343020177829663124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -929,7 +948,7 @@ MonoBehaviour:
   _zoomAttackDelay: 0.5
   _aimColliderLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 3905
   _debugTrasnform: {fileID: 0}
 --- !u!114 &2343020177829663081
 MonoBehaviour:
@@ -971,8 +990,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cmVCam: {fileID: 0}
   _amplitude: 1
-  _intensity: 1
-  _duration: 1
+  _intensity: 2
+  _duration: 0.2
   _noise: {fileID: 0}
 --- !u!114 &2343020177473640427
 MonoBehaviour:

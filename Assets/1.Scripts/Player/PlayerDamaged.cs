@@ -2,6 +2,7 @@ using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class PlayerDamaged : MonoBehaviour
@@ -13,9 +14,13 @@ public class PlayerDamaged : MonoBehaviour
     private float _damageDelay = 1f; // 맞는 딜레이
 
     private bool _isDamage = false; // 현재 맞고있는가
+    private bool _isDead = false; // 죽었는가?
     private Animator _animator = null; // 애니메이터 캐싱준비
 
     private Player _player = null;
+
+    [field:SerializeField]
+    private UnityEvent OnDie = null;
 
     private void Awake()
     {
@@ -42,6 +47,12 @@ public class PlayerDamaged : MonoBehaviour
 
                 if(_hp <= 0)
                 {
+                    if (_isDead)
+                        return;
+                    _isDead = true;
+
+                    OnDie?.Invoke();
+
                     _animator.SetTrigger("Death");
 
                     Invoke("Restart", 2f); // 재시작

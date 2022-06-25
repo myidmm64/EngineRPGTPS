@@ -105,9 +105,10 @@ public class PlayerInputs : MonoBehaviour
 
             if (_playerMove.IsZoom == false) // 줌을 안했으면 그냥 근접공격
             {
-                _animator.SetTrigger("Shoot");
-                _playerMove.IsAttackAble = false;
-                _playerMove.OnBattleReset();
+                if(_playerMove.AttackCnt == 0)
+                {
+                    MeleeAttack(); // 첫번째 공격일 때 start
+                }
             }
             else if (_playerMove.IsZoom == true && _playerMove.IsZoomAttackAble) // 만약 줌을 하고있었다면 줌샷 
             {
@@ -133,6 +134,15 @@ public class PlayerInputs : MonoBehaviour
             _playerMove.CrossHairEnable(false);
             _playerMove.OnZoomOut?.Invoke();
         }
+    }
+
+    //근접공격을 하는 함수
+    public void MeleeAttack() 
+    {
+        _animator.SetTrigger("Shoot");
+        _playerMove.IsAttackAble = false;
+        //_playerMove.OnBattle?.Invoke();
+        _playerMove.OnBattleReset();
     }
 
 }

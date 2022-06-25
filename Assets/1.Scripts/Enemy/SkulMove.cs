@@ -389,6 +389,7 @@ public class SkulMove : MonoBehaviour
 
             _col.enabled = false; // 스컬 콜라이더 없애기
             _atkCollider.enabled = false; // 공격 콜라이더 없애기
+            _atkCollider.gameObject.tag = "Untagged";
 
             OnDieEvent?.Invoke(1); // 경험치 증가시키기
             player.MonsterCnt++;

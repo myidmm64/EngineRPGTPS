@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using DG.Tweening;
 using static Define;
 
 public class Player : MonoBehaviour, IMoveAble
 {
     [SerializeField]
     private float _speed = 5f; // 캐릭터의 이동속도
+    [SerializeField]
+    private int _maxAnimationIdx = 2;
     [SerializeField]
     private float _runSpeed = 10f; // 캐릭터 달리기 이동속도
     [SerializeField]
@@ -38,12 +41,14 @@ public class Player : MonoBehaviour, IMoveAble
     private BoxCollider _atkCollider = null; // 플레이어 공격 콜라이더
     [SerializeField]
     private GameObject _sword = null; // 검 오브젝트
+    private PlayerAttack _playerAttack = null;
 
     private Coroutine IsBattleCo = null; // IsBattleCoroutine을 담아둘 Coroutine 변수
     private Coroutine IsZoomCo = null; // IsZoomCoroutine을 담아둘 Coroutine 변수
     private Coroutine IsAttackCo = null; // 을 담아둘 Coroutine 변수
 
     private int _attackCnt = 0;
+    public int AttackCnt { get => _attackCnt; }
 
     public UnityEvent OnBattle = null; // Battle 상태일 때 실행될 이벤트
     public UnityEvent OnIdle = null; // Battle 상태가 아닐 때 실행될 이벤트
@@ -114,6 +119,7 @@ public class Player : MonoBehaviour, IMoveAble
         // 캐싱
         _animator = GetComponent<Animator>();
         _characterController = GetComponent<CharacterController>();
+        _playerAttack = _atkCollider.GetComponent<PlayerAttack>();
         _cam = MainCam.transform;
 
         //나중에 Core로 옮기셈
@@ -294,12 +300,20 @@ public class Player : MonoBehaviour, IMoveAble
     /// <returns></returns>
     private IEnumerator IsAttackCoroutine()
     {
-        _animator.SetInteger("AttackCnt", _attackCnt);
         _attackCnt++;
-        _attackCnt = Mathf.Clamp(_attackCnt, 0, 2);
+        _animator.SetInteger("AttackCnt", _attackCnt);
         Debug.Log($"attack Cnt => {_attackCnt}");
 
-        yield return new WaitForSeconds(2f);
+        _playerAttack.AttackEffectSpawn(_attackCnt);
+
+        if (_attackCnt == _maxAnimationIdx + 1)
+        {
+            _attackCnt = 0;
+            _animator.SetInteger("AttackCnt", _attackCnt);
+            StopCoroutine(IsAttackCo);
+        }
+
+        yield return new WaitForSeconds(1f);
         _attackCnt = 0;
         _animator.SetInteger("AttackCnt", _attackCnt);
         Debug.Log($"어택 카운트 초기화");
@@ -502,5 +516,21 @@ public class Player : MonoBehaviour, IMoveAble
     public void SetState(PlayerState state)
     {
         _playerState = state;
+    }
+
+    public void Dead()
+    {
+        ExitZoom();
+        MonoBehaviour[] monoBehaviours = GetComponents<MonoBehaviour>();
+        foreach(var m in monoBehaviours)
+        {
+            m.StopAllCoroutines();
+            m.DOKill();
+        }
+
+        IsFreeze = true;
+        IsStop = true;
+        IsAttackAble = false;
+        IsZoomAttackAble = false;
     }
 }

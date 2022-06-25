@@ -28,7 +28,9 @@ public class PlayerDash : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (_player.IsRun || _player.IsZoom) // 달리고있거나 줌 상태면 리턴
+            // 레이캐스트로 제한두기
+
+            if (_player.IsRun || _player.IsZoom || _player.IsFreeze) // 달리고있거나 줌 상태면 리턴
                 return;
             if (_dashAble) // 대시가 가능하면 실행
             {
@@ -46,7 +48,7 @@ public class PlayerDash : MonoBehaviour
     {
         _horizontal = Input.GetAxisRaw("Horizontal");
         _vertical = Input.GetAxisRaw("Vertical");
-        _dashDirection = new Vector3(_horizontal, 0f, Mathf.Clamp(_vertical, 0f, 1f)).normalized;
+        _dashDirection = new Vector3(_horizontal, 0f, _vertical);
 
         if(_player.IsBattle || _player.IsZoom)
         {
@@ -54,6 +56,9 @@ public class PlayerDash : MonoBehaviour
                 _dashDirection = transform.forward; // 안 눌렀을 때 디폴트값으로 앞방향
             else
                 _dashDirection = transform.rotation * _dashDirection;
+
+            if (_vertical < 0f)
+                transform.rotation *= Quaternion.Euler(new Vector3(0f, 180f, 0f));
 
             transform.DOMove(transform.position + _dashDirection * 5f, 0.5f);
         }
