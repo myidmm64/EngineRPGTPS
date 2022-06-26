@@ -20,6 +20,8 @@ public class PlayerInputs : MonoBehaviour
     private GameObject _option = null; // 옵션창
     [SerializeField]
     private GameObject _market = null; // 상점창
+    [SerializeField]
+    private ButtonManager _manager = null;
 
     private bool _isOpenUI = false; // 옵션 UI를 열고있는가?
     private bool _isMarketOpen = false; // 상점 UI를 열고 있는가?
@@ -52,6 +54,8 @@ public class PlayerInputs : MonoBehaviour
     /// </summary>
     private void VisibleMarket()
     {
+        if (_isOpenUI) return;
+
         if(Input.GetKeyDown(KeyCode.Tab))
         {
             if (_isMarketOpen) // 닫기
@@ -79,10 +83,14 @@ public class PlayerInputs : MonoBehaviour
     /// </summary>
     private void VisibleMenu()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (_isMarketOpen) return;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if(_isOpenUI) // 닫기
             {
+                if (_manager.IsOpen) return;
+
                 _isOpenUI = false;
                 _option.SetActive(false);
                 Cursor.visible = false;
@@ -121,7 +129,7 @@ public class PlayerInputs : MonoBehaviour
             {
                 if (_playerUseSkill.MP <= 0) // 마나가 없으면 실행 안함
                     return;
-                _playerUseSkill.MP-=1; // 줌샷을 할 때 마나 감소
+                _playerUseSkill.MP-= 2; // 줌샷을 할 때 마나 감소
                 _playerMove.OnZoomShoot?.Invoke();
             }
         }

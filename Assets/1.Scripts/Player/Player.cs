@@ -84,6 +84,7 @@ public class Player : MonoBehaviour, IMoveAble
 
     [SerializeField]
     private PlayerState _playerState = PlayerState.None; // 플레이어 상태
+    public PlayerState playerState => _playerState;
 
     private int _coin = 0;
     public int Coin { get => _coin; set => _coin = value; } // 현재 가지고있는 코인 (private로 바꿔주세요)
@@ -111,7 +112,8 @@ public class Player : MonoBehaviour, IMoveAble
         Zoom,
         Run,
         Dash,
-        ZoomShot
+        ZoomShot,
+        Skilling
     }
 
     private void Awake()
@@ -174,6 +176,9 @@ public class Player : MonoBehaviour, IMoveAble
             case PlayerState.Dash:
                 break;
             case PlayerState.ZoomShot:
+                HeadRotate();
+                break;
+            case PlayerState.Skilling:
                 HeadRotate();
                 break;
             default:
@@ -263,7 +268,7 @@ public class Player : MonoBehaviour, IMoveAble
     /// 전투 상태일 때 몸 돌리는 함수
     /// </summary>
     /// <param name="즉시 회전"></param>
-    private void HeadRotate(bool immediately = false)
+    public void HeadRotate(bool immediately = false)
     {
 
         Quaternion rot = Quaternion.identity;

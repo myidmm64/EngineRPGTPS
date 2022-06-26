@@ -31,6 +31,11 @@ public class MPPosion : Item
 
     public override void UseItem()
     {
+        if(_playerUseSkill.MP >= _playerUseSkill.MaxMP)
+        {
+            return;
+        }
+
         if (Count > 0) // 개수가 1 이상일때만 적용
         {
             _playerUseSkill.MP += _mpUp;
@@ -52,6 +57,16 @@ public class MPPosion : Item
         }
     }
 
+
+    public void BuyEvent()
+    {
+        if (Price > _player.Coin)
+        {
+            _buyButton.enabled = false;
+            _cantBuyImage.enabled = true;
+        }
+    }
+
     public override void Buy()
     {
         if(Price <= _player.Coin) // 만약 플레이어의 코인이 가격보다 많으면
@@ -63,11 +78,7 @@ public class MPPosion : Item
             _player.Coin -= Price;
             _Pricetext.SetText($"가격 : {Price}");
 
-            if (Price > _player.Coin)
-            {
-                _buyButton.enabled = false;
-                _cantBuyImage.enabled = true;
-            }
+            BuyEvent();
         }
     }
 }

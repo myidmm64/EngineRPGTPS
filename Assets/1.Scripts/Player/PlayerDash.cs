@@ -12,6 +12,8 @@ public class PlayerDash : MonoBehaviour
     private float _coolTime = 2f; // 대시 쿨타임
     [SerializeField]
     private float _dashPower = 5f; // 대시 양
+    [SerializeField]
+    private LayerMask _mapLayer;
     private bool _dashAble = true; // 대시가 가능한가
 
     private float _horizontal = 0f; // 입력값
@@ -29,6 +31,11 @@ public class PlayerDash : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             // 레이캐스트로 제한두기
+            Ray ray = new Ray(transform.position, transform.forward);
+            if(Physics.Raycast(ray, 11f, _mapLayer))
+            {
+                return;
+            }
 
             if (_player.IsRun || _player.IsZoom || _player.IsFreeze) // 달리고있거나 줌 상태면 리턴
                 return;

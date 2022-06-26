@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,6 +19,10 @@ public class LevelUp : MonoBehaviour
     [field: SerializeField]
     private UnityEvent OnExpUp = null; // 경험치가 올라갔을 때 발행될 이벤트
 
+    [SerializeField]
+    private TextMeshPro _levelText = null;
+    [SerializeField]
+    private TextMeshPro _expText = null;
 
     private void Start()
     {

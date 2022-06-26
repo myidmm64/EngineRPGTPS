@@ -4,12 +4,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerDamaged : MonoBehaviour
 {
     [SerializeField]
     private int _hp = 10; // 플레이어의 Hp
-    public int HP { get => _hp; set => _hp = value; }
+    public int HP
+    {
+        get => _hp;
+
+        set
+        {
+            _hp = value;
+
+            _hpSlider.value = (float)_hp / _maxHP;
+        }
+    }
+
+    [SerializeField]
+    private int _maxHP = 10;
+    public int MaxHP
+    {
+        get => _maxHP;
+
+        set
+        {
+            _maxHP = value;
+
+            _hpSlider.value = (float)_hp / _maxHP;
+        }
+    }
+
     [SerializeField]
     private float _damageDelay = 1f; // 맞는 딜레이
 
@@ -22,10 +48,19 @@ public class PlayerDamaged : MonoBehaviour
     [field:SerializeField]
     private UnityEvent OnDie = null;
 
+
+    [SerializeField]
+    private Slider _hpSlider = null;
+
     private void Awake()
     {
         _player = GetComponent<Player>();
         _animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        HP = MaxHP;
     }
 
     private void OnGUI()
@@ -43,9 +78,9 @@ public class PlayerDamaged : MonoBehaviour
         {
             if (_isDamage == false)
             {
-                _hp -= other.GetComponent<SkulAttack>().Damage;
+                HP -= other.GetComponent<SkulAttack>().Damage;
 
-                if(_hp <= 0)
+                if(HP <= 0)
                 {
                     if (_isDead)
                         return;
