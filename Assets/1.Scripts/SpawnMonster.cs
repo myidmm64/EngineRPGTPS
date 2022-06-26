@@ -9,6 +9,9 @@ public class SpawnMonster : MonoBehaviour
     [SerializeField]
     private List<Transform> spawnPoints = new List<Transform>(); // 스폰 위치
 
+    [SerializeField]
+    private GameObject _spawnBeforeEffect = null;
+
     private bool isSpwan = false; // 스폰중인가
 
     private void OnTriggerEnter(Collider other)
@@ -25,6 +28,13 @@ public class SpawnMonster : MonoBehaviour
 
     private IEnumerator Spawn(GameObject target)
     {
+        GameObject effect = Instantiate(_spawnBeforeEffect, transform);
+        Destroy(effect, 2f);
+        transform.parent.GetComponent<MeshRenderer>().material.color = Color.red;
+
+
+        yield return new WaitForSeconds(2f);
+
         for(int i =0; i<spawnPoints.Count; i++) // 몬스터 소환
         {
             int random = Random.Range(0, monsters.Count);

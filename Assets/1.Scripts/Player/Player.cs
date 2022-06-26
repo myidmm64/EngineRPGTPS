@@ -295,7 +295,7 @@ public class Player : MonoBehaviour, IMoveAble
         OnBattle?.Invoke();
         _sword.SetActive(true);
         _atkCollider.enabled = true;
-        IsFreeze = true;
+        _isStop = true;
         IsAttackAble = false;
     }
 
@@ -330,7 +330,7 @@ public class Player : MonoBehaviour, IMoveAble
     public void SwordAttackEnd()
     {
         _atkCollider.enabled = false;
-        IsFreeze = false;
+        _isStop = false;
         IsAttackAble = true;
     }
 

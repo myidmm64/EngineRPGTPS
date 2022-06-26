@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class LevelUp : MonoBehaviour
 {
@@ -20,9 +21,11 @@ public class LevelUp : MonoBehaviour
     private UnityEvent OnExpUp = null; // 경험치가 올라갔을 때 발행될 이벤트
 
     [SerializeField]
-    private TextMeshPro _levelText = null;
+    private TextMeshProUGUI _levelText = null;
     [SerializeField]
-    private TextMeshPro _expText = null;
+    private TextMeshProUGUI _expText = null;
+    [SerializeField]
+    private Slider _expSlider = null;
 
     private void Start()
     {
@@ -30,6 +33,8 @@ public class LevelUp : MonoBehaviour
         _currentExp = 0;
         _currentlevel = 1;
         _residueExp = _targetExp - _currentExp;
+        _expText.SetText($"{_currentExp} / {_targetExp}");
+        _expSlider.value = (float)_currentExp / _targetExp;
     }
 
     private void OnGUI()
@@ -55,10 +60,13 @@ public class LevelUp : MonoBehaviour
             _targetExp += 2;
             _residueExp = _targetExp;
             _currentlevel++;
+            _levelText.SetText($"{_currentlevel}");
             OnLevelUp?.Invoke();
         }
 
-        OnExpUp?.Invoke(); 
+        OnExpUp?.Invoke();
+        _expText.SetText($"{_currentExp} / {_targetExp}");
+        _expSlider.value = (float)_currentExp / _targetExp;
     }
 
 }
