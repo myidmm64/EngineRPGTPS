@@ -129,7 +129,7 @@ public class PlayerInputs : MonoBehaviour
             {
                 if (_playerUseSkill.MP <= 0) // 마나가 없으면 실행 안함
                     return;
-                _playerUseSkill.MP-= 2; // 줌샷을 할 때 마나 감소
+                _playerUseSkill.MP-= 3; // 줌샷을 할 때 마나 감소
                 _playerMove.OnZoomShoot?.Invoke();
             }
         }

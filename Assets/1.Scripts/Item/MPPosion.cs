@@ -25,7 +25,7 @@ public class MPPosion : Item
     {
         //초기화
         Count = 0;
-        Price = 1;
+        Price = 2;
         _Pricetext.SetText($"가격 : {Price}");
     }
 

@@ -27,6 +27,15 @@ public class LevelUp : MonoBehaviour
     [SerializeField]
     private Slider _expSlider = null;
 
+    private PlayerDamaged _playerDamaged = null;
+    private PlayerUseSkill _playerUseSkill = null;
+
+    private void Awake()
+    {
+        _playerDamaged = GetComponent<PlayerDamaged>();
+        _playerUseSkill = GetComponent<PlayerUseSkill>();
+    }
+
     private void Start()
     {
         // 초기화
@@ -37,7 +46,7 @@ public class LevelUp : MonoBehaviour
         _expSlider.value = (float)_currentExp / _targetExp;
     }
 
-    private void OnGUI()
+    /*private void OnGUI()
     {
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
@@ -46,7 +55,7 @@ public class LevelUp : MonoBehaviour
         GUI.Label(new Rect(10, 140, 100, 200), $"현재 경험치 : {_currentExp}", gUI);
         GUI.Label(new Rect(10, 180, 100, 200), $"남은 경험치 : {_residueExp}", gUI);
         GUI.Label(new Rect(10, 220, 100, 200), $"현재 레벨 : {_currentlevel}", gUI);
-    }
+    }*/
 
     public void ExpUp(int value)
     {
@@ -61,6 +70,10 @@ public class LevelUp : MonoBehaviour
             _residueExp = _targetExp;
             _currentlevel++;
             _levelText.SetText($"{_currentlevel}");
+            _playerDamaged.MaxHP += 1;
+            _playerDamaged.HP += 1;
+            _playerUseSkill.MaxMP += 5;
+            _playerUseSkill.MP += 5;
             OnLevelUp?.Invoke();
         }
 

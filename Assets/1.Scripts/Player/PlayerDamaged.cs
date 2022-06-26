@@ -63,14 +63,14 @@ public class PlayerDamaged : MonoBehaviour
         HP = MaxHP;
     }
 
-    private void OnGUI()
+    /*private void OnGUI()
     {
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
         gUI.fontStyle = FontStyle.Bold;
         gUI.normal.textColor = Color.red;
         GUI.Label(new Rect(10, 60, 100, 200), $"HP : {_hp}", gUI);
-    }
+    }*/
 
     private void OnTriggerEnter(Collider other)
     {

@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using DG.Tweening;
 using static Define;
+using TMPro;
 
 public class Player : MonoBehaviour, IMoveAble
 {
@@ -87,7 +88,17 @@ public class Player : MonoBehaviour, IMoveAble
     public PlayerState playerState => _playerState;
 
     private int _coin = 0;
-    public int Coin { get => _coin; set => _coin = value; } // 현재 가지고있는 코인 (private로 바꿔주세요)
+    public int Coin { get => _coin; 
+    set
+        {
+            _coin = value;
+            _coinText.SetText($"{_coin}");
+        }
+    } // 현재 가지고있는 코인 
+
+
+    [SerializeField]
+    private TextMeshProUGUI _coinText = null;
 
     private int _monsterCnt = 0; //
     public int MonsterCnt
@@ -96,12 +107,16 @@ public class Player : MonoBehaviour, IMoveAble
         set
         {
             _monsterCnt = value;
-            if(_monsterCnt >= 10)
+            _monsterCntText.SetText($"{_monsterCnt} / 66");
+            if(_monsterCnt >= 66)
             {
                 Debug.Log("ㅁㄴㅇㅁ");
             }
         }
     }
+
+    [SerializeField]
+    private TextMeshProUGUI _monsterCntText = null;
 
     //플레이어의 상태
     public enum PlayerState
@@ -186,7 +201,7 @@ public class Player : MonoBehaviour, IMoveAble
         }
     }
 
-    private void OnGUI()
+    /*private void OnGUI()
     {
         GUIStyle gUI = new GUIStyle();
         gUI.fontSize = 50;
@@ -200,7 +215,7 @@ public class Player : MonoBehaviour, IMoveAble
         //{
         //    Debug.Log("버튼 누름 !!");
         //}
-    }
+    }*/
 
     /// <summary>
     /// 캐릭터 이동 함수

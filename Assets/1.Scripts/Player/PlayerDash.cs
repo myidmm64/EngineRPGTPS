@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using TMPro;
+using UnityEngine.UI;
 
 public class PlayerDash : MonoBehaviour
 {
@@ -10,6 +12,13 @@ public class PlayerDash : MonoBehaviour
     private Player _player = null; // 플레이어 캐싱 준비
     [SerializeField]
     private float _coolTime = 2f; // 대시 쿨타임
+    [SerializeField]
+    private float _currentTime = 2f;
+    [SerializeField]
+    private TextMeshProUGUI _coolTimeText = null;
+    [SerializeField]
+    private Image _fade = null;
+
     [SerializeField]
     private float _dashPower = 5f; // 대시 양
     [SerializeField]
@@ -30,12 +39,19 @@ public class PlayerDash : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            // 레이캐스트로 제한두기
-            Ray ray = new Ray(transform.position, transform.forward);
+            SetDashDir();
+
+            Ray ray = new Ray(transform.position, _dashDirection);
             if(Physics.Raycast(ray, 11f, _mapLayer))
             {
                 return;
             }
+            Ray ray2 = new Ray(transform.position, transform.forward);
+            if (Physics.Raycast(ray2, 11f, _mapLayer))
+            {
+                return;
+            }
+
 
             if (_player.IsRun || _player.IsZoom || _player.IsFreeze) // 달리고있거나 줌 상태면 리턴
                 return;
@@ -46,6 +62,25 @@ public class PlayerDash : MonoBehaviour
                 StartCoroutine(DashCoroutine());
             }
         }
+
+        _currentTime += Time.deltaTime;
+        _currentTime = Mathf.Clamp(_currentTime, 0f, _coolTime);
+        if(_dashAble)
+            _coolTimeText.SetText("");
+        else
+            _coolTimeText.SetText((_coolTime - _currentTime).ToString("N1"));
+    }
+
+    private void SetDashDir()
+    {
+        // 레이캐스트로 제한두기
+        _horizontal = Input.GetAxisRaw("Horizontal");
+        _vertical = Input.GetAxisRaw("Vertical");
+        _dashDirection = new Vector3(_horizontal, 0f, _vertical);
+        if (_dashDirection == Vector3.zero)
+            _dashDirection = transform.forward; // 안 눌렀을 때 디폴트값으로 앞방향
+        else
+            _dashDirection = transform.rotation * _dashDirection;
     }
 
     /// <summary>
@@ -108,7 +143,10 @@ public class PlayerDash : MonoBehaviour
     private IEnumerator DashCoroutine()
     {
         _dashAble = false;
+        _fade.enabled = true;
+        _currentTime = 0f;
         yield return new WaitForSeconds(_coolTime);
+        _fade.enabled = false;
         _dashAble = true;
     }
 }

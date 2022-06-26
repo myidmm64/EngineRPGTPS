@@ -27,7 +27,7 @@ public class BulletProjectile : MonoBehaviour
     {
         Debug.Log(other.gameObject.name);
         if (other.GetComponent<SkulMove>() != null) // 만약 스컬에 부딫혔으면 데미지
-            other.GetComponent<SkulMove>().Damage(65);
+            other.GetComponent<SkulMove>().Damage(35);
 
         if (other.GetComponent<BulletTarget>() != null) // 타겟에 맞았는가?
         {

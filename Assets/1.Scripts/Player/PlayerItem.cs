@@ -13,11 +13,11 @@ public class PlayerItem : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.T)) // T키를 누르면 HP 포션
+        if(Input.GetKeyDown(KeyCode.F)) // T키를 누르면 HP 포션
         {
             OnHPPosion?.Invoke();
         }
-        if (Input.GetKeyDown(KeyCode.Y)) // Y키를 누르면 MP포션
+        if (Input.GetKeyDown(KeyCode.G)) // Y키를 누르면 MP포션
         {
             OnMPPosion?.Invoke();
         }

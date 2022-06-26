@@ -67,6 +67,7 @@ MonoBehaviour:
   - {fileID: 1142105930420160908}
   - {fileID: 1142105929865489923}
   - {fileID: 1142105929856351918}
+  _spawnBeforeEffect: {fileID: 1273915125232972, guid: 73767e07adddc394d82b994801f89bbb, type: 3}
 --- !u!1 &1142105929567049053
 GameObject:
   m_ObjectHideFlags: 0

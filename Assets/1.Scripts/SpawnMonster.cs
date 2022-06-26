@@ -28,8 +28,8 @@ public class SpawnMonster : MonoBehaviour
 
     private IEnumerator Spawn(GameObject target)
     {
-        GameObject effect = Instantiate(_spawnBeforeEffect, transform);
-        Destroy(effect, 2f);
+        GameObject effect = Instantiate(_spawnBeforeEffect, transform.position, Quaternion.Euler(new Vector3(-90f, 0f ,0f)));
+        Destroy(effect, 5f);
         transform.parent.GetComponent<MeshRenderer>().material.color = Color.red;
 
 
